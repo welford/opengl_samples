@@ -1,0 +1,45 @@
+-- Shared
+
+#version 420 core
+layout(location = 0) in vec3 inVertex;
+layout(location = 1) in vec3 inColour;
+layout(std140, binding=1) uniform Transforms
+{
+uniform mat4		mvp;
+uniform mat4		proj;
+uniform mat4		mv;
+uniform mat4		nrmn;
+}trans;
+
+-- Vertex
+
+out vec3 colour;
+void main()
+{
+	colour = inColour;
+	vec4 finalPosition = trans.mvp * vec4(inVertex,1) ;
+	gl_Position = finalPosition;
+	gl_PointSize = 10.0f;
+}
+
+-- Vertex2
+
+out vec3 colour;
+void main()
+{
+	colour = inColour;
+	vec4 finalPosition = trans.mvp * vec4(inVertex+vec3(0.5,0.5,0),1) ;
+	gl_Position = finalPosition;
+	gl_PointSize = 20.0f;
+}
+
+-- Fragment
+
+#version 420 core
+in vec3 colour;
+out vec4 fragColour;
+void main()
+{
+	float d = (1.0 - gl_FragCoord.z);
+	fragColour = vec4(colour.xyz*d, 1);
+}
