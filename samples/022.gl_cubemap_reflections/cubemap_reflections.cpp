@@ -257,7 +257,7 @@ void MainLoop(CPlatform * const  pPlatform)
 			rotY.Rotate(rotation, 0, 1, 0);
 			//transform_test.ApplyTransform(rotY);		
 			transform.ApplyTransform(rotY);		
-			rotation += 0.5f;
+			rotation += 3.0f* pPlatform->GetDT();
 
 			//model_matrix = transform_test.GetCurrentMatrix();
 

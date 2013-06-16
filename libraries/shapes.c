@@ -94,7 +94,7 @@ int CreateCube(float* pf){
 }
 
 unsigned int GetCubeNormalSize(void){
-	return 36*2;
+	return 36;
 }
 
 int CreateCubeNormal(float* pf){

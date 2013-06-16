@@ -36,7 +36,7 @@ Shape CreateShapeCubeNormals(unsigned int pos_bind, unsigned int clr_bind, unsig
 	Shape shape = {SHAPE_CUBE, 0, 0, 0};
 
 	shape.n_vertices = GetCubeNormalSize();
-	unsigned int nCubeFloats = ( shape.n_vertices + 1 )*3;
+	unsigned int nCubeFloats = ( shape.n_vertices*2 + 1 )*3;
 	float* pCubeVertices = ( float* ) malloc ( sizeof( float ) * nCubeFloats );	
 
 	pCubeVertices[0] = 1.0f;
@@ -238,6 +238,7 @@ void DrawShape(Shape shape){
 	case SHAPE_TORUS:
 	case SHAPE_CUBE:
 		WRender::DrawArray(WRender::TRIANGLES, shape.n_vertices, 0);
+		break;
 	default:
 		return;
 	}	
