@@ -5,9 +5,7 @@ They aren't commented very well, but hopefully give a stripped down insite into 
 A few notes:
 	-All samples reply on glew which i have included statically in glew_static
 	-All but one project relies on "platform" to create the windows environment
-		I have tried to make it as easy as possible for this to run on different OSs
-	-Xinput.lib is required BUT!
-		To be honest i am not using it right now so it could be removed
+		I have tried to make it as easy as possible for this to run on different OSs	
 	-The early examples don't use my OpenGL wrapper, they do use my shader wrapper though - it should be very simple to follow
 
 the helper libraries are:
@@ -36,5 +34,10 @@ The exaples so far are:
 15. gl_shadow: very simple example of how to do shadow mapping, no other lighting is performed.
 16. gl_shadows_multi_fbo: brute force exampe of rendering multiple shadows using multiple FBOs, will do some layered rendering later 
 17. gl_geometry_shader: contains 3 examples of geometry shaders 1. pass through, 2. adding extra addtributes 3. Duplicating geometry
+18. gl_gamma_correction : g,c,b keys control Gamma, Contrast, and Brightness respectively 
+19. gl_postprocess_template : Renders a sphere to a FBO with a depth and RGB texture bound. Then uses the depth and RGB textures in a post process render.
+20. gl_high_dynamic_range: not quite finished
+21. gl_cubemap: setting up and rendering cubemaps
+22. gl_cubemap_reflections: improves on the previous lesson, adds reflections
 
 I will add more as i go along.

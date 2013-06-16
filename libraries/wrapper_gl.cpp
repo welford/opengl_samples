@@ -126,15 +126,20 @@ void ActiveTexture(Texture::Unit unit)
 	glActiveTexture(GL_TEXTURE0 + unit); 
 }
 
-void BindTexture(Texture::SObject tx)
+void BindTexture(Texture::SObject obj)
 {
-	glBindTexture(enumToGLTextureType[tx.descriptor.type], tx.handle);
+	Texture::Type type = obj.descriptor.type;
+	//if ( IS_CUBE_TEX(type) ){
+	//	type = Texture::TEX_CUBE_MAP;
+	//}
+	glBindTexture(enumToGLTextureType[ type ], obj.handle);
 }
 
-void BindTexture(Texture::SObject tx, Texture::Unit unit)
+void BindTexture(Texture::SObject obj, Texture::Unit unit)
 {
 	ActiveTexture(unit);
-	glBindTexture(enumToGLTextureType[tx.descriptor.type], tx.handle);
+	BindTexture(obj);
+	//glBindTexture(enumToGLTextureType[tx.descriptor.type], tx.handle);
 }
 
 void CopyFrameRGBToTexture(unsigned int sx, unsigned int sy)
@@ -183,8 +188,9 @@ bool CreateBaseTextureData(Texture::SObject& obj, const Texture::SDescriptor& de
 
 bool CreateTextureData(Texture::SObject& obj, const Texture::SDescriptor& desc, const Pixel::Data& data)
 {
-	glBindTexture(enumToGLTextureType[desc.type], obj.handle);
-	if(glIsTexture(obj.handle) == GL_FALSE)
+	//glBindTexture(enumToGLTextureType[desc.type], obj.handle);
+	BindTexture(obj);
+	if(!IS_CUBE_TEX(desc.type) && glIsTexture(obj.handle) == GL_FALSE )
 		return false;
 	if(desc.nSamples == 0)
 	{
@@ -192,6 +198,10 @@ bool CreateTextureData(Texture::SObject& obj, const Texture::SDescriptor& desc, 
 			glTexImage1D(enumToGLTextureType[desc.type], data.level, enumToGLTextureFormats[desc.fmt], desc.w, 0, enumToGLPixelDataFormats[data.fmt], enumToGLPixelDataTypes[data.type], data.pData);
 		else if(IS_2D_TEX(desc.type))
 			glTexImage2D(enumToGLTextureType[desc.type], data.level, enumToGLTextureFormats[desc.fmt], desc.w, desc.h, 0, enumToGLPixelDataFormats[data.fmt], enumToGLPixelDataTypes[data.type], data.pData);
+		else if(IS_CUBE_TEX(desc.type)){
+			if(desc.type != Texture::TEX_CUBE_MAP)
+				glTexImage2D(enumToGLTextureType[desc.type], data.level, enumToGLTextureFormats[desc.fmt], desc.w, desc.h, 0, enumToGLPixelDataFormats[data.fmt], enumToGLPixelDataTypes[data.type], data.pData);
+		}
 		else if(IS_3D_TEX(desc.type))
 			glTexImage3D(enumToGLTextureType[desc.type], data.level, enumToGLTextureFormats[desc.fmt], desc.w, desc.h, desc.d, 0, enumToGLPixelDataFormats[data.fmt], enumToGLPixelDataTypes[data.type], data.pData);
 		else if(IS_TEX_BUFFER(desc.type))
@@ -216,7 +226,8 @@ bool CreateTextureData(Texture::SObject& obj, const Texture::SDescriptor& desc, 
 
 void GenerateTextureMipMap(Texture::SObject& obj)
 {
-	glBindTexture(enumToGLTextureType[obj.descriptor.type], obj.handle);
+	//glBindTexture(enumToGLTextureType[obj.descriptor.type], obj.handle);
+	BindTexture(obj);
 	if(obj.descriptor.genMipMap == Texture::GEN_MIPMAP)
 		glGenerateMipmap(enumToGLTextureType[obj.descriptor.type]);
 }
@@ -224,7 +235,9 @@ void GenerateTextureMipMap(Texture::SObject& obj)
 //TODO change data descriptor!
 void UpdateTextureData(const Texture::SObject& obj, const Pixel::Data& data)
 {
-	glBindTexture(enumToGLTextureType[obj.descriptor.type], obj.handle);			
+	//glBindTexture(enumToGLTextureType[ type ], obj.handle);			
+	BindTexture(obj);			
+
 	if(obj.descriptor.nSamples == 0)
 	{
 		if(IS_1D_TEX(obj.descriptor.type))
@@ -242,10 +255,14 @@ void UpdateTextureData(const Texture::SObject& obj, const Pixel::Data& data)
 
 void SetTextureParams(const Texture::SObject& obj, Texture::SParam* param, unsigned int count)
 {
-	glBindTexture(enumToGLTextureType[obj.descriptor.type], obj.handle);			
-	for(unsigned int i=0;i<count; i++)
-	{
-		glTexParameteri(enumToGLTextureType[obj.descriptor.type], enumToGLTextureParamName[param[i].name], enumToGLTextureParams[param[i].param]);
+	Texture::Type type = obj.descriptor.type;
+	if ( IS_CUBE_TEX(type) ){
+		type = Texture::TEX_CUBE_MAP;
+	}
+
+	BindTexture( obj );
+	for(unsigned int i=0;i<count; i++){
+		glTexParameteri( enumToGLTextureType[ type ], enumToGLTextureParamName[ param[i].name ], enumToGLTextureParams[ param[i].param ] );
 	}
 
 }

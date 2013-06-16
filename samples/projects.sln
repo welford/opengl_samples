@@ -129,6 +129,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "020.gl_high_dynamic_range",
 		{74B60FB3-20C7-9065-9E3B-74558196B703} = {74B60FB3-20C7-9065-9E3B-74558196B703}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "021.gl_cubemap", "021.gl_cubemap\gl_cubemap.vcxproj", "{41F992CD-C0D0-4778-8988-9C0157D2C712}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "022.gl_cubemap_reflections", "022.gl_cubemap_reflections\gl_cubemap_reflections.vcxproj", "{8F4A3A4E-131C-446E-9F74-6D4D9BB4C7E8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug MX|Win32 = Debug MX|Win32
@@ -329,6 +333,22 @@ Global
 		{3D2758BF-CEC8-4320-A90C-24196E945163}.Release MX|Win32.Build.0 = Release|Win32
 		{3D2758BF-CEC8-4320-A90C-24196E945163}.Release|Win32.ActiveCfg = Release|Win32
 		{3D2758BF-CEC8-4320-A90C-24196E945163}.Release|Win32.Build.0 = Release|Win32
+		{41F992CD-C0D0-4778-8988-9C0157D2C712}.Debug MX|Win32.ActiveCfg = Debug|Win32
+		{41F992CD-C0D0-4778-8988-9C0157D2C712}.Debug MX|Win32.Build.0 = Debug|Win32
+		{41F992CD-C0D0-4778-8988-9C0157D2C712}.Debug|Win32.ActiveCfg = Debug|Win32
+		{41F992CD-C0D0-4778-8988-9C0157D2C712}.Debug|Win32.Build.0 = Debug|Win32
+		{41F992CD-C0D0-4778-8988-9C0157D2C712}.Release MX|Win32.ActiveCfg = Release|Win32
+		{41F992CD-C0D0-4778-8988-9C0157D2C712}.Release MX|Win32.Build.0 = Release|Win32
+		{41F992CD-C0D0-4778-8988-9C0157D2C712}.Release|Win32.ActiveCfg = Release|Win32
+		{41F992CD-C0D0-4778-8988-9C0157D2C712}.Release|Win32.Build.0 = Release|Win32
+		{8F4A3A4E-131C-446E-9F74-6D4D9BB4C7E8}.Debug MX|Win32.ActiveCfg = Debug|Win32
+		{8F4A3A4E-131C-446E-9F74-6D4D9BB4C7E8}.Debug MX|Win32.Build.0 = Debug|Win32
+		{8F4A3A4E-131C-446E-9F74-6D4D9BB4C7E8}.Debug|Win32.ActiveCfg = Debug|Win32
+		{8F4A3A4E-131C-446E-9F74-6D4D9BB4C7E8}.Debug|Win32.Build.0 = Debug|Win32
+		{8F4A3A4E-131C-446E-9F74-6D4D9BB4C7E8}.Release MX|Win32.ActiveCfg = Release|Win32
+		{8F4A3A4E-131C-446E-9F74-6D4D9BB4C7E8}.Release MX|Win32.Build.0 = Release|Win32
+		{8F4A3A4E-131C-446E-9F74-6D4D9BB4C7E8}.Release|Win32.ActiveCfg = Release|Win32
+		{8F4A3A4E-131C-446E-9F74-6D4D9BB4C7E8}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

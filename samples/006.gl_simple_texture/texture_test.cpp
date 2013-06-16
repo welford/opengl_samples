@@ -200,5 +200,5 @@ void CleanUp(void)
 	WRender::DeleteBuffer(ab);
 	WRender::DeleteBuffer(eab);
 	for(i=0;i<MAX_TEXTURES;i++)
-		WRender::DeleteTexture(tex[i]);	
+		WRender::DeleteTexture( tex[i] );	
 }

@@ -123,10 +123,11 @@ namespace Texture
 		TEX_3D,
 		TEX_BUFFER,
 	};
-	#define IS_1D_TEX(TYP) (TYP<=Texture::TEX_1D_ARRAY)? true: false
-	#define IS_2D_TEX(TYP) (TYP>=Texture::TEX_2D && TYP<Texture::TEX_3D)? true: false
-	#define IS_3D_TEX(TYP) (TYP==Texture::TEX_3D)? true: false
-	#define IS_TEX_BUFFER(TYP) (TYP==Texture::TEX_BUFFER)? true: false
+	#define IS_1D_TEX(TYP) ((TYP<=Texture::TEX_1D_ARRAY)? true: false)
+	#define IS_2D_TEX(TYP) ((TYP>=Texture::TEX_2D && TYP<Texture::TEX_CUBE_MAP)? true: false)
+	#define IS_CUBE_TEX(TYP) ((TYP>=Texture::TEX_CUBE_MAP && TYP<Texture::TEX_3D)? true: false)
+	#define IS_3D_TEX(TYP) ((TYP==Texture::TEX_3D)? true: false)
+	#define IS_TEX_BUFFER(TYP) ((TYP==Texture::TEX_BUFFER)? true: false)
 
 	//http://www.opengl.org/wiki/Image_Format#Texture_and_Renderbuffer
 	enum Format

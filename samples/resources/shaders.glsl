@@ -3,6 +3,8 @@
 #version 420 core
 layout(location = 0) in vec3 inVertex;
 layout(location = 1) in vec3 inColour;
+layout(location = 2) in vec3 inNormal;
+
 layout(std140, binding=1) uniform Transforms
 {
 uniform mat4		mvp;
@@ -313,6 +315,23 @@ void main()
 	gl_Position = position;
 }
 
+
+-- FlatShading.VertexClr
+
+out vec3 colour;
+out vec4 position;
+out vec4 light;
+
+uniform vec4 lgt = vec4(-1,-1,0.3,0);
+
+void main()
+{
+	colour = inColour;
+	light = normalize(lgt);
+	position = trans.mvp * vec4(inVertex,1) ;
+	gl_Position = position;
+}
+
 -- FlatShading.Fragment
 
 #version 420 core
@@ -329,6 +348,78 @@ void main()
 	fragColour = vec4(colour.rgb*ndl,1);
 }
 
+
+-- CubemapReflections.Vertex
+
+out vec3 colour;
+out vec3 eye_dir;
+out vec3 normal;
+//out vec3 cubemap_lookup;
+
+uniform mat4 inverse_view = mat4(1.0f);
+uniform mat4 model_matrix = mat4(1.0f);
+
+void main()
+{
+	//vec3 eye_dir, normal;
+	vec4 pos;
+
+	colour = inColour;	
+
+	pos = trans.mv * vec4(inVertex, 1);
+	eye_dir = pos.xyz/pos.w;
+	normal = (trans.nrmn * vec4(inNormal, 0)).xyz;		
+	//cubemap_lookup = reflect( eye_dir,  normal );
+	//cubemap_lookup = ( inverse_view * vec4(cubemap_lookup, 0) ).xyz;	
+
+	//eye_dir = (model_matrix * vec4(inVertex, 1)).xyz;
+	//normal = (model_matrix * vec4(inNormal, 0)).xyz;		
+	//cubemap_lookup = reflect( eye_dir,  normal );	
+	
+
+	gl_Position = trans.mvp * vec4(inVertex,1);
+}
+
+-- CubemapReflections.Fragment
+uniform samplerCube cube_map;
+uniform mat4 inverse_view = mat4(1.0f);
+
+in vec3 eye_dir;
+in vec3 normal;
+
+//in vec3 cubemap_lookup;
+
+out vec4 fragColour;
+
+void main()
+{
+	vec3 cubemap_lookup = reflect( eye_dir,  normal );
+	cubemap_lookup = ( inverse_view * vec4(cubemap_lookup, 0) ).xyz;	
+
+	vec4 cube_map_colour = texture( cube_map, cubemap_lookup );
+	fragColour = vec4(cube_map_colour.rgb, 1);	
+}
+
+-- Skymap.Vertex
+
+out vec3 cubemap_lookup;
+
+void main()
+{
+	cubemap_lookup = inVertex;
+	gl_Position = trans.mvp * vec4(inVertex,1);
+}
+
+-- Skymap.Fragment
+
+uniform samplerCube cube_map;
+in vec3 cubemap_lookup;
+out vec4 fragColour;
+
+void main()
+{
+	fragColour = texture( cube_map, cubemap_lookup );
+}
 
 -- Gamma.Vertex
 
@@ -435,15 +526,5 @@ void main()
 	//fragColour = vec4(ranged_luminance, ranged_luminance, ranged_luminance, clr.a);
 	//fragColour = vec4(textureLod(avg_lum, tex.st, 9).rgb, clr.a);	
 	fragColour = vec4(clr.rgb*ranged_luminance, clr.a);
-	//fragColour = vec4(clr.rgb, clr.a);
-	/*
-	if(clr.r > 1.0f)
-		fragColour = vec4(1, 0, 0, 0);
-	else if(clr.r <= 0)
-		fragColour = vec4(0, 1, 0, 0);
-	else
-		fragColour = vec4(1, 1, 1, 0);
-	*/
 	
 }
-

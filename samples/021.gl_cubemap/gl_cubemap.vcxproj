@@ -11,20 +11,19 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{B17F9D12-21C7-4753-A9E4-FF9216E31701}</ProjectGuid>
+    <ProjectGuid>{41F992CD-C0D0-4778-8988-9C0157D2C712}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>utils</RootNamespace>
-    <VCTargetsPath Condition="'$(VCTargetsPath11)' != '' and '$(VSVersion)' == '' and $(VisualStudioVersion) == ''">$(VCTargetsPath11)</VCTargetsPath>
+    <RootNamespace>gl_cubemap</RootNamespace>
+    <ProjectName>021.gl_cubemap</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v100</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
@@ -42,16 +41,10 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(IncludePath)</IncludePath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LibraryPath>$(LibraryPath)</LibraryPath>
+    <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(IncludePath)</IncludePath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LibraryPath>$(LibraryPath)</LibraryPath>
+    <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -59,11 +52,12 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>GLEW_STATIC;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GLEW_STATIC;WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -74,44 +68,26 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>GLEW_STATIC;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GLEW_STATIC;WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <None Include="ReadMe.txt" />
+    <ClCompile Include="cubemap.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Libraries\bstrlib.h" />
-    <ClInclude Include="..\..\libraries\debug_print.h" />
-    <ClInclude Include="..\..\Libraries\glsw.h" />
-    <ClInclude Include="..\..\libraries\keymap.h" />
-    <ClInclude Include="..\..\Libraries\matrix_stack.h" />
-    <ClInclude Include="..\..\libraries\platform.h" />
-    <ClInclude Include="..\..\libraries\platform.win.h" />
-    <ClInclude Include="..\..\Libraries\shader_gl.h" />
-    <ClInclude Include="..\..\Libraries\shader_gl.hpp" />
-    <ClInclude Include="..\..\Libraries\shapes.h" />
-    <ClInclude Include="..\..\libraries\shapes_util.h" />
-    <ClInclude Include="..\..\Libraries\transforms.h" />
-    <ClInclude Include="..\..\Libraries\wrapper_gl.hpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\Libraries\bstrlib.c" />
-    <ClCompile Include="..\..\Libraries\glsw.c" />
-    <ClCompile Include="..\..\Libraries\matrix_stack.cpp" />
-    <ClCompile Include="..\..\libraries\platform.win.cpp" />
-    <ClCompile Include="..\..\Libraries\shader_gl.c" />
-    <ClCompile Include="..\..\Libraries\shader_gl.cpp" />
-    <ClCompile Include="..\..\Libraries\shapes.c" />
-    <ClCompile Include="..\..\libraries\shapes_util.cpp" />
-    <ClCompile Include="..\..\Libraries\transforms.cpp" />
-    <ClCompile Include="..\..\Libraries\wrapper_gl.cpp" />
+    <ProjectReference Include="..\..\Libraries\glew\build\vc6\glew_static.vcxproj">
+      <Project>{74b60fb3-20c7-9065-9e3b-74558196b703}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\utils\utils.vcxproj">
+      <Project>{b17f9d12-21c7-4753-a9e4-ff9216e31701}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

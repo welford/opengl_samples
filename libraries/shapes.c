@@ -22,6 +22,189 @@ static void Normalise(XYZ*const p)
 	}
 }
 
+
+unsigned int GetCubeSize(void){
+	return 36;
+}
+int CreateCube(float* pf){
+	float pos[8][3] = {
+		{-1.0f,	-1.0f,  1.0f},
+		{-1.0f,	 1.0f,  1.0f},
+		{ 1.0f,	 1.0f,  1.0f},
+		{ 1.0f,	-1.0f,  1.0f},
+
+		{-1.0f,	-1.0f, -1.0f},
+		{-1.0f,	 1.0f, -1.0f},
+		{ 1.0f,	 1.0f, -1.0f},
+		{ 1.0f,	-1.0f, -1.0f},
+	};
+	//front face +z
+	*pf++ = pos[0][0];	*pf++ = pos[0][1];	*pf++ = pos[0][2];
+	*pf++ = pos[2][0];	*pf++ = pos[2][1];	*pf++ = pos[2][2];
+	*pf++ = pos[1][0];	*pf++ = pos[1][1];	*pf++ = pos[1][2];
+
+	*pf++ = pos[2][0];	*pf++ = pos[2][1];	*pf++ = pos[2][2];
+	*pf++ = pos[0][0];	*pf++ = pos[0][1];	*pf++ = pos[0][2];
+	*pf++ = pos[3][0];	*pf++ = pos[3][1];	*pf++ = pos[3][2];
+
+	//left face -x
+	*pf++ = pos[4+0][0];	*pf++ = pos[4+0][1];	*pf++ = pos[4+0][2];
+	*pf++ = pos[1][0];		*pf++ = pos[1][1];		*pf++ = pos[1][2];
+	*pf++ = pos[4+1][0];	*pf++ = pos[4+1][1];	*pf++ = pos[4+1][2];
+
+	*pf++ = pos[1][0];		*pf++ = pos[1][1];		*pf++ = pos[1][2];
+	*pf++ = pos[4+0][0];	*pf++ = pos[4+0][1];	*pf++ = pos[4+0][2];
+	*pf++ = pos[0][0];		*pf++ = pos[0][1];		*pf++ = pos[0][2];
+
+	//back face -z
+	*pf++ = pos[4+2][0];	*pf++ = pos[4+2][1];	*pf++ = pos[4+2][2];
+	*pf++ = pos[4+0][0];	*pf++ = pos[4+0][1];	*pf++ = pos[4+0][2];
+	*pf++ = pos[4+1][0];	*pf++ = pos[4+1][1];	*pf++ = pos[4+1][2];
+
+	*pf++ = pos[4+0][0];	*pf++ = pos[4+0][1];	*pf++ = pos[4+0][2];
+	*pf++ = pos[4+2][0];	*pf++ = pos[4+2][1];	*pf++ = pos[4+2][2];
+	*pf++ = pos[4+3][0];	*pf++ = pos[4+3][1];	*pf++ = pos[4+3][2];
+
+	//right face +x
+	*pf++ = pos[3][0];		*pf++ = pos[3][1];		*pf++ = pos[3][2];
+	*pf++ = pos[4+2][0];	*pf++ = pos[4+2][1];	*pf++ = pos[4+2][2];
+	*pf++ = pos[2][0];		*pf++ = pos[2][1];		*pf++ = pos[2][2];
+
+	*pf++ = pos[4+2][0];	*pf++ = pos[4+2][1];	*pf++ = pos[4+2][2];
+	*pf++ = pos[3][0];		*pf++ = pos[3][1];		*pf++ = pos[3][2];
+	*pf++ = pos[4+3][0];	*pf++ = pos[4+3][1];	*pf++ = pos[4+3][2];
+
+	//top face +y
+	*pf++ = pos[1][0];		*pf++ = pos[1][1];		*pf++ = pos[1][2];
+	*pf++ = pos[4+2][0];	*pf++ = pos[4+2][1];	*pf++ = pos[4+2][2];
+	*pf++ = pos[4+1][0];	*pf++ = pos[4+1][1];	*pf++ = pos[4+1][2];
+
+	*pf++ = pos[4+2][0];	*pf++ = pos[4+2][1];	*pf++ = pos[4+2][2];
+	*pf++ = pos[1][0];		*pf++ = pos[1][1];		*pf++ = pos[1][2];
+	*pf++ = pos[2][0];		*pf++ = pos[2][1];		*pf++ = pos[2][2];
+
+	//bottom face +y
+	*pf++ = pos[0][0];		*pf++ = pos[0][1];		*pf++ = pos[0][2];
+	*pf++ = pos[4+3][0];	*pf++ = pos[4+3][1];	*pf++ = pos[4+3][2];
+	*pf++ = pos[3][0];		*pf++ = pos[3][1];		*pf++ = pos[3][2];
+
+	*pf++ = pos[4+3][0];	*pf++ = pos[4+3][1];	*pf++ = pos[4+3][2];
+	*pf++ = pos[0][0];		*pf++ = pos[0][1];		*pf++ = pos[0][2];	
+	*pf++ = pos[4+0][0];	*pf++ = pos[4+0][1];	*pf++ = pos[4+0][2];	
+}
+
+unsigned int GetCubeNormalSize(void){
+	return 36*2;
+}
+
+int CreateCubeNormal(float* pf){
+	float pos[8][3] = {
+		{-1.0f,	-1.0f,  1.0f},
+		{-1.0f,	 1.0f,  1.0f},
+		{ 1.0f,	 1.0f,  1.0f},
+		{ 1.0f,	-1.0f,  1.0f},
+
+		{-1.0f,	-1.0f, -1.0f},
+		{-1.0f,	 1.0f, -1.0f},
+		{ 1.0f,	 1.0f, -1.0f},
+		{ 1.0f,	-1.0f, -1.0f},
+	};
+	//front face +z
+	*pf++ = pos[0][0];	*pf++ = pos[0][1];	*pf++ = pos[0][2];
+	*pf++ = 0;	*pf++ = 0;	*pf++ = 1.0f;
+	*pf++ = pos[2][0];	*pf++ = pos[2][1];	*pf++ = pos[2][2];
+	*pf++ = 0;	*pf++ = 0;	*pf++ = 1.0f;
+	*pf++ = pos[1][0];	*pf++ = pos[1][1];	*pf++ = pos[1][2];	
+	*pf++ = 0;	*pf++ = 0;	*pf++ = 1.0f;
+	
+	*pf++ = pos[2][0];	*pf++ = pos[2][1];	*pf++ = pos[2][2];
+	*pf++ = 0;	*pf++ = 0;	*pf++ = 1.0f;
+	*pf++ = pos[0][0];	*pf++ = pos[0][1];	*pf++ = pos[0][2];
+	*pf++ = 0;	*pf++ = 0;	*pf++ = 1.0f;
+	*pf++ = pos[3][0];	*pf++ = pos[3][1];	*pf++ = pos[3][2];
+	*pf++ = 0;	*pf++ = 0;	*pf++ = 1.0f;
+
+	//left face -x
+	*pf++ = pos[4+0][0];	*pf++ = pos[4+0][1];	*pf++ = pos[4+0][2];
+	*pf++ = -1.0f;	*pf++ = 0;	*pf++ = 0;
+	*pf++ = pos[1][0];		*pf++ = pos[1][1];		*pf++ = pos[1][2];
+	*pf++ = -1.0f;	*pf++ = 0;	*pf++ = 0;
+	*pf++ = pos[4+1][0];	*pf++ = pos[4+1][1];	*pf++ = pos[4+1][2];
+	*pf++ = -1.0f;	*pf++ = 0;	*pf++ = 0;
+
+	*pf++ = pos[1][0];		*pf++ = pos[1][1];		*pf++ = pos[1][2];
+	*pf++ = -1.0f;	*pf++ = 0;	*pf++ = 0;
+	*pf++ = pos[4+0][0];	*pf++ = pos[4+0][1];	*pf++ = pos[4+0][2];
+	*pf++ = -1.0f;	*pf++ = 0;	*pf++ = 0;
+	*pf++ = pos[0][0];		*pf++ = pos[0][1];		*pf++ = pos[0][2];
+	*pf++ = -1.0f;	*pf++ = 0;	*pf++ = 0;
+
+	//back face -z
+	*pf++ = pos[4+2][0];	*pf++ = pos[4+2][1];	*pf++ = pos[4+2][2];
+	*pf++ = 0;	*pf++ = 0;	*pf++ = -1.0f;
+	*pf++ = pos[4+0][0];	*pf++ = pos[4+0][1];	*pf++ = pos[4+0][2];
+	*pf++ = 0;	*pf++ = 0;	*pf++ = -1.0f;
+	*pf++ = pos[4+1][0];	*pf++ = pos[4+1][1];	*pf++ = pos[4+1][2];
+	*pf++ = 0;	*pf++ = 0;	*pf++ = -1.0f;
+
+	*pf++ = pos[4+0][0];	*pf++ = pos[4+0][1];	*pf++ = pos[4+0][2];
+	*pf++ = 0;	*pf++ = 0;	*pf++ = -1.0f;
+	*pf++ = pos[4+2][0];	*pf++ = pos[4+2][1];	*pf++ = pos[4+2][2];
+	*pf++ = 0;	*pf++ = 0;	*pf++ = -1.0f;
+	*pf++ = pos[4+3][0];	*pf++ = pos[4+3][1];	*pf++ = pos[4+3][2];
+	*pf++ = 0;	*pf++ = 0;	*pf++ = -1.0f;
+
+	//right face +x
+	*pf++ = pos[3][0];		*pf++ = pos[3][1];		*pf++ = pos[3][2];
+	*pf++ = 1.0f;	*pf++ = 0;	*pf++ = 0;
+	*pf++ = pos[4+2][0];	*pf++ = pos[4+2][1];	*pf++ = pos[4+2][2];
+	*pf++ = 1.0f;	*pf++ = 0;	*pf++ = 0;
+	*pf++ = pos[2][0];		*pf++ = pos[2][1];		*pf++ = pos[2][2];
+	*pf++ = 1.0f;	*pf++ = 0;	*pf++ = 0;
+
+	*pf++ = pos[4+2][0];	*pf++ = pos[4+2][1];	*pf++ = pos[4+2][2];
+	*pf++ = 1.0f;	*pf++ = 0;	*pf++ = 0;
+	*pf++ = pos[3][0];		*pf++ = pos[3][1];		*pf++ = pos[3][2];
+	*pf++ = 1.0f;	*pf++ = 0;	*pf++ = 0;
+	*pf++ = pos[4+3][0];	*pf++ = pos[4+3][1];	*pf++ = pos[4+3][2];
+	*pf++ = 1.0f;	*pf++ = 0;	*pf++ = 0;
+
+	//top face +y
+	*pf++ = pos[1][0];		*pf++ = pos[1][1];		*pf++ = pos[1][2];
+	*pf++ = 0;	*pf++ = 1.0f;	*pf++ = 0;
+	*pf++ = pos[4+2][0];	*pf++ = pos[4+2][1];	*pf++ = pos[4+2][2];
+	*pf++ = 0;	*pf++ = 1.0f;	*pf++ = 0;
+	*pf++ = pos[4+1][0];	*pf++ = pos[4+1][1];	*pf++ = pos[4+1][2];
+	*pf++ = 0;	*pf++ = 1.0f;	*pf++ = 0;
+
+	*pf++ = pos[4+2][0];	*pf++ = pos[4+2][1];	*pf++ = pos[4+2][2];
+	*pf++ = 0;	*pf++ = 1.0f;	*pf++ = 0;
+	*pf++ = pos[1][0];		*pf++ = pos[1][1];		*pf++ = pos[1][2];
+	*pf++ = 0;	*pf++ = 1.0f;	*pf++ = 0;
+	*pf++ = pos[2][0];		*pf++ = pos[2][1];		*pf++ = pos[2][2];
+	*pf++ = 0;	*pf++ = 1.0f;	*pf++ = 0;
+
+	//bottom face -y
+	*pf++ = pos[0][0];		*pf++ = pos[0][1];		*pf++ = pos[0][2];
+	*pf++ = 0;	*pf++ = -1.0f;	*pf++ = 0;
+	*pf++ = pos[4+3][0];	*pf++ = pos[4+3][1];	*pf++ = pos[4+3][2];
+	*pf++ = 0;	*pf++ = -1.0f;	*pf++ = 0;
+	*pf++ = pos[3][0];		*pf++ = pos[3][1];		*pf++ = pos[3][2];
+	*pf++ = 0;	*pf++ = -1.0f;	*pf++ = 0;
+
+	*pf++ = pos[4+3][0];	*pf++ = pos[4+3][1];	*pf++ = pos[4+3][2];
+	*pf++ = 0;	*pf++ = -1.0f;	*pf++ = 0;
+	*pf++ = pos[0][0];		*pf++ = pos[0][1];		*pf++ = pos[0][2];	
+	*pf++ = 0;	*pf++ = -1.0f;	*pf++ = 0;
+	*pf++ = pos[4+0][0];	*pf++ = pos[4+0][1];	*pf++ = pos[4+0][2];
+	*pf++ = 0;	*pf++ = -1.0f;	*pf++ = 0;
+}
+
+
+unsigned int GetNSphereSize(int iterations){
+	return (unsigned int)powl( 4.0, (long double)iterations )*8*3;
+}
+
 /*
    Create a triangular facet approximation to a sphere
    Return the number of facets created.
@@ -84,6 +267,10 @@ int CreateNSphere(float*const pf,int iterations)
 }
 
 #define TWO_PI 3.14159265*2.0
+
+unsigned int GetCylinderSize(int segments){
+	return segments*4*3;
+}
 
 //4 triangles per segment
 int CreateCylinder(float*const pf, unsigned int nSegments, float height, float radius)
@@ -170,6 +357,9 @@ int CreateCylinder(float*const pf, unsigned int nSegments, float height, float r
 	return 4*nSegments; //returns number of faces
 }
 
+unsigned int GetConeSize(int segments){
+	return segments*4*3;
+}
 //2 triangles per segment
 int CreateCone(float*const pf, unsigned int nSegments, float height, float radius)
 {
@@ -225,6 +415,10 @@ int CreateCone(float*const pf, unsigned int nSegments, float height, float radiu
 		nextPos[1] = curPos[0]*sinStep + curPos[1]*cosStep;
 	}
 	return 2*nSegments;
+}
+
+unsigned int GetTorusSize(int nTubeSegments, int nTorusSegments){
+	return 2*nTubeSegments*nTorusSegments*3;
 }
 
 int CreateFrustum(float*const pf, float l, float r, float b, float t, float n, float f)
