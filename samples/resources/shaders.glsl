@@ -348,7 +348,6 @@ void main()
 	fragColour = vec4(colour.rgb*ndl,1);
 }
 
-
 -- CubemapReflections.Vertex
 
 out vec3 colour;
@@ -397,6 +396,86 @@ void main()
 	cubemap_lookup = ( inverse_view * vec4(cubemap_lookup, 0) ).xyz;	
 
 	vec4 cube_map_colour = texture( cube_map, cubemap_lookup );
+	fragColour = vec4(cube_map_colour.rgb, 1);	
+}
+
+-- LocalCubemapReflections.Vertex
+
+out vec3 colour;
+out vec3 eye_dir;
+out vec3 normal;
+
+uniform mat4 inverse_view = mat4(1.0f);
+uniform mat4 model_matrix = mat4(1.0f);
+
+void main()
+{
+	vec4 pos;
+	colour = inColour;	
+	pos = trans.mv * vec4(inVertex, 1);
+	eye_dir = normalize(pos.xyz/pos.w);
+	normal = normalize((trans.nrmn * vec4(inNormal, 0)).xyz);
+	gl_Position = trans.mvp * vec4(inVertex,1);
+}
+
+-- LocalCubemapReflections.Fragment
+
+uniform samplerCube cube_map;
+uniform mat4 inverse_view = mat4(1.0f);
+
+in vec3 eye_dir;
+in vec3 normal;
+
+out vec4 fragColour;
+
+void main()
+{
+	vec3 cubemap_lookup = reflect( eye_dir,  normal );
+	vec3 ws_cubemap_lookup = ( inverse_view * vec4(cubemap_lookup, 0) ).xyz;	//bascially in Cube Space
+
+	vec3 cs_pos = vec3(9.0, 0, 0);
+
+	//ray segment vs sphere
+	//	where 
+	//	- m is start of ray(P) minus the center of the circle (C), P-C 
+	//	- d is the normalized direction of the ray
+	//	- t is the length along the ray 
+	//	- r is the radius of the circle
+	// t^2 + 2(m.d)t + (m.m) - r^2 = 0
+	// which is quadratic equation with the terms
+	// a = t^2
+	// b = 2(m.d) 	
+	// c = m.m - r^2
+
+	float b = 2.0 * dot( ws_cubemap_lookup, cs_pos );
+	float c = dot( cs_pos, cs_pos ) - 1.0*1.0;
+	float discrim = b * b - 4.0 * c;
+	bool hasIntersects = false;
+	
+	//float4 reflColor = float4(1, 0, 0, 0);
+	float nearT = 0;
+	vec4 cube_map_colour = float4(1, 0, 0, 0);
+
+	if (discrim > 0) {
+		// pick a small error value very close to zero as "epsilon"
+		discrim = sqrt(discrim);
+		nearT = -(discrim-b)/2.0f
+		hasIntersects = true;//((abs(sqrt(discrim) - b) / 2.0) > 0.00001);
+		if(nearT <= 0.0001){
+			nearT = (discrim - b)/2.0f
+			hasIntersects = (nearT > 0.0001)
+		}
+	}
+	if (hasIntersects) {
+		// determine where on the unit sphere reflVect intersects
+		ws_cubemap_lookup = nearT * ws_cubemap_lookup - cs_pos;
+		// reflVect.y = -reflVect.y; // optional - see text
+		// now use the new intersection location as the 3D direction
+		cube_map_colour = texture( cube_map, ws_cubemap_lookup);
+	}
+
+
+	//vec4 cube_map_colour = texture( cube_map, ws_cubemap_lookup);
 	fragColour = vec4(cube_map_colour.rgb, 1);	
 }
 

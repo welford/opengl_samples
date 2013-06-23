@@ -26,7 +26,7 @@ Transforms transforms;
 //buffer for drawing
 unsigned int ubo=0;	
 //amount of vertices to draw
-Shape sphere,cube;
+Shape sphere;
 Shape box;
 CShaderProgram program_sphere;
 CShaderProgram program_cube;
@@ -132,8 +132,8 @@ void Setup(CPlatform * const  pPlatform)
 
 	// - - - - - - - - - - - - - - - - - - - -
 	// - - - - - - - - - - - - - - - - - - - -
-	glswGetShadersAlt( "shaders.Shared+shaders.CubemapReflections.Vertex", pVertStr, 2);
-	glswGetShadersAlt( "shaders.Shared+shaders.CubemapReflections.Fragment", pFragStr, 2);
+	glswGetShadersAlt( "shaders.Shared+shaders.LocalCubemapReflections.Vertex", pVertStr, 2);
+	glswGetShadersAlt( "shaders.Shared+shaders.LocalCubemapReflections.Fragment", pFragStr, 2);
 	CShader vertexShader1(CShader::VERT, pVertStr, 2);
 	CShader fragmentShader1(CShader::FRAG, pFragStr, 2);	
 	//setup the shaders
@@ -149,12 +149,7 @@ void Setup(CPlatform * const  pPlatform)
 	//set up shapes
 	//sphere = CreateShapeSphere();
 	sphere = CreateShapeSphereNormals();
-	cube = CreateShapeCubeNormals();
 	box = CreateShapeCube();
-	
-	//sphere = CreateShapeCylinder();
-	//sphere = CreateShapeCone();
-	//sphere = CreateShapeTorus();
 
 	// - - - - - - - - - -
 	// set up cubemap
@@ -181,15 +176,15 @@ void MainLoop(CPlatform * const  pPlatform)
 	transform.Push();			
 	{
 		CMatrix44 rotLat,rotLong,inverse_camera, model_matrix;
-		CVec3df camera_position(0,0,distance);
 
 		rotLat.Rotate(latitude, 1, 0, 0);
 		rotLong.Rotate(longitude, 0, 1, 0);
 
+		//position the camera
 		transform.Translate(cameraPosition);
 		transform.ApplyTransform(rotLat);
 		transform.ApplyTransform(rotLong);		
-		//transform.Translate(CVec3df(-9,0,0));
+		transform.Translate( -sphere_position );
 
 		inverse_camera = transform.GetCurrentMatrix();		
 		inverse_camera = inverse_camera.InvertSimple();
@@ -225,7 +220,7 @@ void MainLoop(CPlatform * const  pPlatform)
 		transform.Push();					
 		{
 			//transform_test.Translate(0.0f, 0, 0);
-			//transform.Translate(0.0f, 0, 0);
+			transform.Translate(sphere_position);
 
 			//model_matrix = transform_test.GetCurrentMatrix();
 
@@ -249,44 +244,7 @@ void MainLoop(CPlatform * const  pPlatform)
 			DrawShape(sphere);
 		}
 		//transform_test.Pop();
-		transform.Pop();
-		
-		//transform_test.Push();
-		transform.Push();
-		{
-			static float rotation = 0;
-			//transform_test.Translate(2.5f, 0, 0);
-			transform.Translate(2.5f, 0, 0);
-			CMatrix44 rotY;
-			rotY.Rotate(rotation, 0, 1, 0);
-			//transform_test.ApplyTransform(rotY);		
-			transform.ApplyTransform(rotY);		
-			rotation += 3.0f* pPlatform->GetDT();
-
-			//model_matrix = transform_test.GetCurrentMatrix();
-
-			transforms.mv = transform.GetCurrentMatrix();
-			transforms.mvp = transforms.proj * transforms.mv;
-			CMatrix33 normal;
-
-			normal = transforms.mv;
-			normal = normal.Invert();
-			normal = normal.Transpose();			
-			transforms.nrm[ 0] = normal.x.x;			transforms.nrm[ 1] = normal.x.y;			transforms.nrm[ 2] = normal.x.z;
-			transforms.nrm[ 4] = normal.y.x;			transforms.nrm[ 5] = normal.y.y;			transforms.nrm[ 6] = normal.y.z;
-			transforms.nrm[ 8] = normal.z.x;			transforms.nrm[ 9] = normal.z.y;			transforms.nrm[10] = normal.z.z;
-
-			WRender::UpdateBuffer(WRender::UNIFORM, WRender::DYNAMIC, ubo, sizeof(Transforms), (void*)&transforms, 0);				
-			WRender::EnableCulling(true);			
-			WRender::CullMode(WRender::BACK_FACE);
-			program_sphere.Start();
-			program_sphere.SetMtx44("inverse_view",inverse_camera.data);
-			//program_sphere.SetMtx44("model_matrix", model_matrix.data);
-			DrawShape(cube);
-		}
-		//transform_test.Pop();
-		transform.Pop();
-		
+		transform.Pop();		
 	}
 	transform.Pop();		
 
@@ -313,7 +271,6 @@ void CleanUp(void)
 {	
 	WRender::DeleteBuffer(ubo);
 	DestroyShape(sphere);
-	DestroyShape(cube);
 	DestroyShape(box);
 	WRender::DeleteTexture( cubemap_tex );	
 

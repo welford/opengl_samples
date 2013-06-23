@@ -220,7 +220,7 @@ void MainLoop(CPlatform * const  pPlatform)
 	//first pass to texture
 	{
 		program[0].Start();
-		WRender::SetClearColour(0.1f,0.1f,0.1f,0);
+		WRender::SetClearColour(10.0f,10.1f,10.1f,0);
 		WRender::BindFrameBuffer(WRender::FrameBuffer::DRAW, main_fbo);
 		WRender::SetupViewport(0, 0, RENDER_WIDTH_HEIGHT, RENDER_WIDTH_HEIGHT);
 		WRender::ClearScreenBuffer(COLOR_BIT | DEPTH_BIT);
