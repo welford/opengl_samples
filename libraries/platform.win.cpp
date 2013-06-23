@@ -492,7 +492,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			winPlatform.GetMouse().rmb  = false; break;
 		//Characters
 		case WM_CHAR:
-			d_printf("ascii : %d\n", wParam);
+			//d_printf("ascii : %d\n", wParam);
 			winPlatform.ConsoleInputCallback(wParam);
 			break;
 		//KEYS

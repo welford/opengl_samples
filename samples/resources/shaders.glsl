@@ -304,13 +304,13 @@ out vec3 colour;
 out vec4 position;
 out vec4 light;
 
-uniform vec3 clr = vec3(5.0,5.0,5.0);
-uniform vec4 lgt = vec4(-1,-1,0.3,0);
+uniform vec3 clr = vec3(0.5, 0.5, 0.5);
+uniform vec4 lgt = vec4(-1,-1,0,0);
 
 void main()
 {
 	colour = clr;
-	light = normalize(lgt);
+	light = lgt;
 	position = trans.mvp * vec4(inVertex,1) ;
 	gl_Position = position;
 }
@@ -322,12 +322,12 @@ out vec3 colour;
 out vec4 position;
 out vec4 light;
 
-uniform vec4 lgt = vec4(-1,-1,0.3,0);
+uniform vec4 lgt = vec4( -1, -1, 0.3, 0 );
 
 void main()
 {
 	colour = inColour;
-	light = normalize(lgt);
+	light = lgt;
 	position = trans.mvp * vec4(inVertex,1) ;
 	gl_Position = position;
 }
@@ -344,7 +344,7 @@ out vec4 fragColour;
 void main()
 {
 	vec3 normal = normalize(cross(dFdx(position.xyz), dFdy(position.xyz)));
-	float ndl = max(dot(normal, light.xyz),0.01);
+	float ndl = max(dot(normal, normalize(light.xyz)),0.0);
 	fragColour = vec4(colour.rgb*ndl,1);
 }
 
@@ -528,10 +528,13 @@ uniform float inverse_gamma = 1.0/1.0;
 
 void main()
 {
+	//vec4 clr = texture(src_image, tex.st);
+	//clr.rgb = clr.rgb + brightness;
+	//clr.rgb = ((clr.rgb-vec3(0.5)) * contrast) + vec3(0.5);
+	//fragColour = vec4(pow(clr.rgb,vec3(inverse_gamma)),clr.a);
+
 	vec4 clr = texture(src_image, tex.st);
-	clr.rgb = clr.rgb + brightness;
-	clr.rgb = ((clr.rgb-vec3(0.5)) * contrast) + vec3(0.5);
-	fragColour = vec4(pow(clr.rgb,vec3(inverse_gamma)),clr.a);
+	fragColour = vec4( pow( clr.rgb, vec3(inverse_gamma) ) ,clr.a);
 }
 
 
@@ -570,6 +573,9 @@ void main()
 -- Post.HDR.Luminance.Fragment
 
 #version 420 core
+
+//http://www.cis.rit.edu/people/faculty/ferwerda/publications/sig02_paper.pdf
+// equation 1
 in vec2 tex;
 out vec4 fragColour;
 uniform sampler2D src;
@@ -590,6 +596,7 @@ in vec2 tex;
 out vec4 fragColour;
 uniform sampler2D src;
 uniform sampler2D avg_lum;
+uniform float smallest_pure_white;
 
 void main()
 {
@@ -600,10 +607,21 @@ void main()
 
 	float average_lug_luminance = exp(textureLod(avg_lum, tex.st, 9).r);	
 	float scaled_luminance = (key/average_lug_luminance) * lum;
-	float ranged_luminance = scaled_luminance/(1+scaled_luminance);
+	
+	// this is all from the below
+	//http://www.cis.rit.edu/people/faculty/ferwerda/publications/sig02_paper.pdf
+	// equation 3
+	//float ranged_luminance = scaled_luminance/(1+scaled_luminance);
+	// or 
+	// equation 4
+	float ranged_luminance = ((scaled_luminance)*(1 + scaled_luminance/(smallest_pure_white*smallest_pure_white)))/(1+scaled_luminance);
+	
+	//test- - - - - - - - - - - - - - - - - - - - 
 	//fragColour = vec4(average_lug_luminance, average_lug_luminance, average_lug_luminance, clr.a);
 	//fragColour = vec4(ranged_luminance, ranged_luminance, ranged_luminance, clr.a);
 	//fragColour = vec4(textureLod(avg_lum, tex.st, 9).rgb, clr.a);	
-	fragColour = vec4(clr.rgb*ranged_luminance, clr.a);
+	//- - - - - - - - - - - - - - - - - - - - - - 
+
+	fragColour = vec4( pow( clr.rgb * ranged_luminance, vec3(1/2.2) ), clr.a);
 	
 }

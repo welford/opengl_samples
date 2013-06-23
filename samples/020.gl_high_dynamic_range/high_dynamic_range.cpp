@@ -5,6 +5,7 @@
 #include <math.h>
 #include "transforms.h"
 #include "glsw.h"
+#include "debug_print.h"
 
 //PTT
 static const float sqVertices[] = {
@@ -211,6 +212,9 @@ void Setup(CPlatform * const  pPlatform)
 	Transform::CreateProjectionMatrix(transforms.proj, -1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 50.0f);
 }
 
+static float white = 0.0f;
+static float smallest_pure_white = 1.0f;
+
 void MainLoop(CPlatform * const  pPlatform)
 {	//update the main application
 	CVec3df cameraPosition(0, 0.0f, -2.1f);
@@ -220,7 +224,7 @@ void MainLoop(CPlatform * const  pPlatform)
 	//first pass to texture
 	{
 		program[0].Start();
-		WRender::SetClearColour(10.0f,10.1f,10.1f,0);
+		WRender::SetClearColour(white, white, white,0);
 		WRender::BindFrameBuffer(WRender::FrameBuffer::DRAW, main_fbo);
 		WRender::SetupViewport(0, 0, RENDER_WIDTH_HEIGHT, RENDER_WIDTH_HEIGHT);
 		WRender::ClearScreenBuffer(COLOR_BIT | DEPTH_BIT);
@@ -278,6 +282,8 @@ void MainLoop(CPlatform * const  pPlatform)
 		WRender::SetupViewport(0, 0, RENDER_WIDTH_HEIGHT, RENDER_WIDTH_HEIGHT);
 				
 		program[2].Start();
+		program[2].SetFloat("smallest_pure_white", smallest_pure_white);
+
 		WRender::BindTexture(texRGB,WRender::Texture::UNIT_0);
 		WRender::BindTexture(texDownSample,WRender::Texture::UNIT_1);
 		WRender::BindVertexArrayObject(sqVao);		
@@ -285,15 +291,34 @@ void MainLoop(CPlatform * const  pPlatform)
 	}
 
 	pPlatform->UpdateBuffers();
-	if(pPlatform->GetKeyboard().keys[KB_UP].IsPressed())
-		latitude += 90.0f * pPlatform->GetDT();
-	if(pPlatform->GetKeyboard().keys[KB_DOWN].IsPressed())
-		latitude -= 90.0f * pPlatform->GetDT();
+	if(! pPlatform->GetKeyboard().keys[KB_LEFTSHIFT].IsPressed()){
+		if(pPlatform->GetKeyboard().keys[KB_UP].IsPressed()){
+			white += 1.0f * pPlatform->GetDT();
+			d_printf("white:%f\n", white);
+		}
+		if(pPlatform->GetKeyboard().keys[KB_DOWN].IsPressed()){
+			white -= 1.0f * pPlatform->GetDT();
+			if(white < 0.0f)
+				white = 0.0f;
+			d_printf("white:%f\n", white);
+		}
+	}else{
+		if(pPlatform->GetKeyboard().keys[KB_UP].IsPressed()){
+			smallest_pure_white += 1.0f * pPlatform->GetDT();
+			d_printf("smallest_pure_white:%f\n", smallest_pure_white);
+		}
+		if(pPlatform->GetKeyboard().keys[KB_DOWN].IsPressed()){
+			smallest_pure_white -= 1.0f * pPlatform->GetDT();
+			if(smallest_pure_white < 0.0f)
+				smallest_pure_white = 0.0f;
+			d_printf("smallest_pure_white:%f\n", smallest_pure_white);
+		}
+	}
 		
-	if(pPlatform->GetKeyboard().keys[KB_LEFT].IsPressed())//l
-		longitude += 90.0f * pPlatform->GetDT();
-	if(pPlatform->GetKeyboard().keys[KB_RIGHT].IsPressed())//r
-		longitude -= 90.0f * pPlatform->GetDT();
+	//if(pPlatform->GetKeyboard().keys[KB_LEFT].IsPressed())//l
+	//	longitude += 90.0f * pPlatform->GetDT();
+	//if(pPlatform->GetKeyboard().keys[KB_RIGHT].IsPressed())//r
+	//	longitude -= 90.0f * pPlatform->GetDT();
 }
 
 void CleanUp(void)
