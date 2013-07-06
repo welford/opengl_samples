@@ -65,9 +65,11 @@ namespace nv_dds
     const unsigned long DDSF_VOLUME          = 0x00200000l;
 
     // compressed texture types
-    const unsigned long FOURCC_DXT1 = 0x31545844l; //(MAKEFOURCC('D','X','T','1'))
-    const unsigned long FOURCC_DXT3 = 0x33545844l; //(MAKEFOURCC('D','X','T','3'))
-    const unsigned long FOURCC_DXT5 = 0x35545844l; //(MAKEFOURCC('D','X','T','5'))
+    const unsigned long FOURCC_DXT1 = 0x31545844l;	//(MAKEFOURCC('D','X','T','1'))
+    const unsigned long FOURCC_DXT3 = 0x33545844l;	//(MAKEFOURCC('D','X','T','3'))
+    const unsigned long FOURCC_DXT5 = 0x35545844l;	//(MAKEFOURCC('D','X','T','5'))
+    const unsigned long FOURCC_RGBA16 = 113;		//
+
 
     struct DXTColBlock
     {
@@ -319,6 +321,7 @@ namespace nv_dds
             unsigned int clamp_size(unsigned int size);
             unsigned int size_dxtc(unsigned int width, unsigned int height);
             unsigned int size_rgb(unsigned int width, unsigned int height);
+			unsigned int size_rgbaf(unsigned int width, unsigned int height);
             inline void swap_endian(void *val);
 
             // calculates 4-byte aligned width of image
@@ -339,6 +342,7 @@ namespace nv_dds
             void write_texture(const CTexture &texture, FILE *fp);
             
             unsigned int m_format;
+			unsigned int m_texel_data_format;
             unsigned int m_components;
             TextureType m_type;
             bool m_valid;

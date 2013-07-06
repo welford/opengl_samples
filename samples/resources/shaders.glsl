@@ -452,18 +452,18 @@ void main()
 	float discrim = b * b - 4.0 * c;
 	bool hasIntersects = false;
 	
-	//float4 reflColor = float4(1, 0, 0, 0);
+	//vec4 reflColor = vec4(1, 0, 0, 0);
 	float nearT = 0;
-	vec4 cube_map_colour = float4(1, 0, 0, 0);
+	vec4 cube_map_colour = vec4(1, 0, 0, 0);
 
 	if (discrim > 0) {
 		// pick a small error value very close to zero as "epsilon"
 		discrim = sqrt(discrim);
-		nearT = -(discrim-b)/2.0f
-		hasIntersects = true;//((abs(sqrt(discrim) - b) / 2.0) > 0.00001);
+		nearT = -(discrim-b)/2.0f;
+		//hasIntersects = true;//((abs(sqrt(discrim) - b) / 2.0) > 0.00001);
 		if(nearT <= 0.0001){
-			nearT = (discrim - b)/2.0f
-			hasIntersects = (nearT > 0.0001)
+			nearT = (discrim - b)/2.0f;
+			hasIntersects = (nearT > 0.0001) ? true : false;
 		}
 	}
 	if (hasIntersects) {
@@ -473,8 +473,6 @@ void main()
 		// now use the new intersection location as the 3D direction
 		cube_map_colour = texture( cube_map, ws_cubemap_lookup);
 	}
-
-
 	//vec4 cube_map_colour = texture( cube_map, ws_cubemap_lookup);
 	fragColour = vec4(cube_map_colour.rgb, 1);	
 }

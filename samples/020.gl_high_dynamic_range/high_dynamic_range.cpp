@@ -52,6 +52,7 @@ unsigned int nSphereVertices;
 
 //FBO to render to
 #define RENDER_WIDTH_HEIGHT 640
+#define LUM_PATH_WIDTH_HEIGHT 128
 #define TEXTURE_WIDTH_HEIGHT 512
 
 WRender::FrameBuffer::SObject main_fbo;			//Rendered at  RENDER_WIDTH_HEIGHT*RENDER_WIDTH_HEIGHT
@@ -137,7 +138,7 @@ void Setup(CPlatform * const  pPlatform)
 	WRender::Texture::SDescriptor descMain = {WRender::Texture::TEX_2D, WRender::Texture::RGBA16F, RENDER_WIDTH_HEIGHT, RENDER_WIDTH_HEIGHT, 0, 0, WRender::Texture::DONT_GEN_MIPMAP};
 	WRender::Texture::SDescriptor descDepth = {WRender::Texture::TEX_2D, WRender::Texture::DEPTH_COMPONENT, RENDER_WIDTH_HEIGHT, RENDER_WIDTH_HEIGHT, 0, 0, WRender::Texture::DONT_GEN_MIPMAP};
 
-	WRender::Texture::SDescriptor descDownsample = {WRender::Texture::TEX_2D, WRender::Texture::RGBA16F, TEXTURE_WIDTH_HEIGHT, TEXTURE_WIDTH_HEIGHT, 0, 0, WRender::Texture::GEN_MIPMAP};
+	WRender::Texture::SDescriptor descDownsample = {WRender::Texture::TEX_2D, WRender::Texture::RGBA16F, LUM_PATH_WIDTH_HEIGHT, LUM_PATH_WIDTH_HEIGHT, 0, 0, WRender::Texture::GEN_MIPMAP};
 
 	WRender::Texture::SParam param[] ={	
 		{ WRender::Texture::MIN_FILTER, WRender::Texture::LINEAR},
@@ -259,7 +260,7 @@ void MainLoop(CPlatform * const  pPlatform)
 	{
 		WRender::SetClearColour(1.0,0,0,0);
 		WRender::BindFrameBuffer(WRender::FrameBuffer::DRAW, downsampled_fbo);
-		WRender::SetupViewport(0, 0, TEXTURE_WIDTH_HEIGHT, TEXTURE_WIDTH_HEIGHT);
+		WRender::SetupViewport(0, 0, LUM_PATH_WIDTH_HEIGHT, LUM_PATH_WIDTH_HEIGHT);
 		
 
 		program[1].Start();

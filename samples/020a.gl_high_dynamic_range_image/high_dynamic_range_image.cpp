@@ -6,6 +6,7 @@
 #include "transforms.h"
 #include "glsw.h"
 #include "debug_print.h"
+#include "nv_dds.h"
 
 //PTT
 static const float sqVertices[] = {
@@ -60,6 +61,9 @@ WRender::Texture::SObject texD;
 
 WRender::FrameBuffer::SObject downsampled_fbo;	//Rendered at  TEXTURE_WIDTH_HEIGHT*TEXTURE_WIDTH_HEIGHT
 WRender::Texture::SObject texDownSample;		//stores downsampled luminance versions in mipnmap layers
+
+
+WRender::Texture::SObject texRGBA16F;
 
 //functions
 void Setup(CPlatform * const  pPlatform);
@@ -136,8 +140,8 @@ void Setup(CPlatform * const  pPlatform)
 	//setup the textures
 	WRender::Texture::SDescriptor descMain = {WRender::Texture::TEX_2D, WRender::Texture::RGBA16F, RENDER_WIDTH_HEIGHT, RENDER_WIDTH_HEIGHT, 0, 0, WRender::Texture::DONT_GEN_MIPMAP};
 	WRender::Texture::SDescriptor descDepth = {WRender::Texture::TEX_2D, WRender::Texture::DEPTH_COMPONENT, RENDER_WIDTH_HEIGHT, RENDER_WIDTH_HEIGHT, 0, 0, WRender::Texture::DONT_GEN_MIPMAP};
-
 	WRender::Texture::SDescriptor descDownsample = {WRender::Texture::TEX_2D, WRender::Texture::RGBA16F, TEXTURE_WIDTH_HEIGHT, TEXTURE_WIDTH_HEIGHT, 0, 0, WRender::Texture::GEN_MIPMAP};
+	WRender::Texture::SDescriptor descImage = {WRender::Texture::TEX_2D, WRender::Texture::RGBA16F, 512, 512, 0, 0, WRender::Texture::DONT_GEN_MIPMAP};
 
 	WRender::Texture::SParam param[] ={	
 		{ WRender::Texture::MIN_FILTER, WRender::Texture::LINEAR},
@@ -161,7 +165,16 @@ void Setup(CPlatform * const  pPlatform)
 	//for 2nd pass
 	WRender::CreateBaseTexture(texDownSample, descDownsample);
 	WRender::SetTextureParams(texDownSample,param+4,4);
-	
+
+	//for HDR image 
+	nv_dds::CDDSImage image;
+	image.load("../resources/Habib_House_Med.dds");
+	descImage.w = image.get_width();
+	descImage.h = image.get_height();
+	WRender::Pixel::Data pixelData = {WRender::Pixel::RGBA, WRender::Pixel::HALF_FLOAT, 0, image};
+	WRender::CreateBaseTextureData( texRGBA16F, descImage, pixelData );
+	WRender::SetTextureParams(texRGB,param,4);
+
 	// - - - - - - - - - - 
 	//setup Frame Buffer
 

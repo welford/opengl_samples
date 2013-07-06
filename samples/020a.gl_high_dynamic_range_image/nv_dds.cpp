@@ -199,6 +199,7 @@ PFNGLCOMPRESSEDTEXIMAGE3DARBPROC CDDSImage::glCompressedTexImage3DARB = NULL;
 // default constructor
 CDDSImage::CDDSImage()
   : m_format(0),
+    m_texel_data_format(0),
     m_components(0),
     m_type(TextureNone),
     m_valid(false)
@@ -219,6 +220,7 @@ void CDDSImage::create_textureFlat(unsigned int format, unsigned int components,
     clear();
     
     m_format = format;
+	m_texel_data_format = GL_UNSIGNED_BYTE; //TODO FIX THIS
     m_components = components;
     m_type = TextureFlat;
 
@@ -236,7 +238,8 @@ void CDDSImage::create_texture3D(unsigned int format, unsigned int components, c
     // remove any existing images
     clear();
 
-    m_format = format;
+    m_format = format; 
+	m_texel_data_format = GL_UNSIGNED_BYTE; //TODO: FIX THIS
     m_components = components;
     m_type = Texture3D;
 
@@ -277,6 +280,7 @@ void CDDSImage::create_textureCubemap(unsigned int format, unsigned int componen
     clear();
 
     m_format = format;
+	m_texel_data_format = GL_UNSIGNED_BYTE;
     m_components = components;
     m_type = TextureCubemap;
 
@@ -297,6 +301,7 @@ void CDDSImage::create_textureCubemap(unsigned int format, unsigned int componen
 // flipImage - specifies whether image is flipped on load, default is true
 bool CDDSImage::load(string filename, bool flipImage)
 {
+	int component_size = 1;
     assert(filename.length() != 0);
     
     // clear any previously loaded images
@@ -361,6 +366,12 @@ bool CDDSImage::load(string filename, bool flipImage)
                 m_format = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
                 m_components = 4;
                 break;
+			case FOURCC_RGBA16:
+				m_format = GL_RGBA16F;
+				m_texel_data_format = GL_HALF_FLOAT;
+                m_components = 4;
+				component_size = 2;
+				break;
             default:
                 fclose(fp);
                 return false;
@@ -413,7 +424,7 @@ bool CDDSImage::load(string filename, bool flipImage)
         CTexture &img = m_images[n];
         
         // calculate surface size
-        unsigned int size = (this->*sizefunc)(width, height)*depth;
+        unsigned int size = (this->*sizefunc)(width, height)*depth*component_size;
 
         // load surface
         unsigned char *pixels = new unsigned char[size];
@@ -752,10 +763,10 @@ bool CDDSImage::upload_texture2D(unsigned int imageIndex, GLenum target)
             glGetIntegerv(GL_UNPACK_ALIGNMENT, &alignment);
             glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
         }
-
-        glTexImage2D(target, 0, m_components, image.get_width(), 
-            image.get_height(), 0, m_format, GL_UNSIGNED_BYTE, 
-            image);
+		static const int gl_internal_format[] = {GL_RED,GL_RG,GL_RGB,GL_RGBA,GL_RGBA};
+		glTexImage2D(target, 0, gl_internal_format[m_components], image.get_width(), 
+			image.get_height(), 0, m_format, m_texel_data_format, 
+			 image);
 
         // load all mipmaps
         for (unsigned int i = 0; i < image.get_num_mipmaps(); i++)
@@ -769,7 +780,6 @@ bool CDDSImage::upload_texture2D(unsigned int imageIndex, GLenum target)
         if (alignment != -1)
             glPixelStorei(GL_UNPACK_ALIGNMENT, alignment);
     }
-    
     return true;
 }
 
@@ -905,6 +915,13 @@ inline unsigned int CDDSImage::size_dxtc(unsigned int width, unsigned int height
 inline unsigned int CDDSImage::size_rgb(unsigned int width, unsigned int height)
 {
     return width*height*m_components;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// calculates size of uncompressed RGBA float texture in bytes
+inline unsigned int CDDSImage::size_rgbaf(unsigned int width, unsigned int height)
+{
+    return width*height*m_components*sizeof(float);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
