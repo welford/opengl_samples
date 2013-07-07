@@ -133,7 +133,7 @@ HGLRC CreateOpenGLContext(HDC hdc, unsigned int mjr, unsigned int mnr)
 	return hrc;
 }
 /*
-Create an OpenGL compatible widnwos context
+Create an OpenGL compatible widnows context
 
 -RegisterClassExA
 -CreateWindowExA
@@ -152,7 +152,7 @@ bool CPlatform::Create(wchar_t* title, int glMajor, int glMinor, int width, int 
 	
 		
 	pData->m_hInst = GetModuleHandle(0); //http://msdn.microsoft.com/en-us/library/windows/desktop/ms683199(v=vs.85).aspx
-	DWORD dwStyle = WS_SYSMENU | WS_POPUP | WS_CAPTION;
+	DWORD dwStyle = WS_SYSMENU | WS_POPUP | WS_CAPTION;// | WS_THICKFRAME;
     DWORD dwExStyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;// Window Extended Style http://msdn.microsoft.com/en-us/library/windows/desktop/ff700543(v=vs.85).aspx
 	HGLRC	tempContext;	//we set up the window first before we can get our final rendering context in GL3.0+
     RECT rect;    	

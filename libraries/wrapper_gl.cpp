@@ -198,8 +198,10 @@ bool CreateTextureData(Texture::SObject& obj, const Texture::SDescriptor& desc, 
 	{
 		if(IS_1D_TEX(desc.type))
 			glTexImage1D(enumToGLTextureType[desc.type], data.level, enumToGLTextureFormats[desc.fmt], desc.w, 0, enumToGLPixelDataFormats[data.fmt], enumToGLPixelDataTypes[data.type], data.pData);
-		else if(IS_2D_TEX(desc.type))
+		else if(IS_2D_TEX(desc.type)){			
 			glTexImage2D(enumToGLTextureType[desc.type], data.level, enumToGLTextureFormats[desc.fmt], desc.w, desc.h, 0, enumToGLPixelDataFormats[data.fmt], enumToGLPixelDataTypes[data.type], data.pData);
+			
+		}
 		else if(IS_CUBE_TEX(desc.type)){
 			if(desc.type != Texture::TEX_CUBE_MAP)
 				glTexImage2D(enumToGLTextureType[desc.type], data.level, enumToGLTextureFormats[desc.fmt], desc.w, desc.h, 0, enumToGLPixelDataFormats[data.fmt], enumToGLPixelDataTypes[data.type], data.pData);

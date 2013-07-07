@@ -1,7 +1,6 @@
 #include "platform.h"
 #include "wrapper_gl.hpp"
 #include <shader_gl.hpp>
-#include <shapes.h>
 #include <math.h>
 #include "transforms.h"
 #include "glsw.h"
@@ -46,16 +45,14 @@ CShaderProgram program[3]; //0 normal,  1 downsample, 2 tonemapping
 
 //buffer for drawing
 unsigned int ubo=0;	
-unsigned int vaoSphere=0, abSphere=0;	
 unsigned int sqVao=0, sqEab=0, sqAb=0;	
-//amount of vertices to draw
-unsigned int nSphereVertices;
 
 //FBO to render to
-#define RENDER_WIDTH_HEIGHT 640
+#define RENDER_WIDTH 1200
+#define RENDER_HEIGHT 803
 #define TEXTURE_WIDTH_HEIGHT 512
 
-WRender::FrameBuffer::SObject main_fbo;			//Rendered at  RENDER_WIDTH_HEIGHT*RENDER_WIDTH_HEIGHT
+WRender::FrameBuffer::SObject main_fbo;			//Rendered at  RENDER_WIDTH*RENDER_HEIGHT
 WRender::Texture::SObject texRGB;
 WRender::Texture::SObject texD;
 
@@ -73,7 +70,7 @@ void CleanUp(void);
 int PlatformMain( void ){
 	pPlatform = GetPlatform();	
 	pPlatform->ShowDebugConsole();
-	pPlatform->Create(L"Hello", 4, 2, RENDER_WIDTH_HEIGHT, RENDER_WIDTH_HEIGHT, 24, 8, 24, 8, CPlatform::MS_0);	
+	pPlatform->Create(L"Hello", 4, 2, RENDER_WIDTH, RENDER_HEIGHT, 24, 8, 24, 8, CPlatform::MS_0);	
 	Setup(pPlatform);
 	while(!pPlatform->IsQuitting())
 		MainLoop(pPlatform);
@@ -86,21 +83,18 @@ void Setup(CPlatform * const  pPlatform)
 	unsigned int got = 0;
 	const char *pVertStr[2] = {0,0}, *pFragStr = 0;
 
-	unsigned int nSphereFloats;
-	float *pSphereVertices = 0;
-	unsigned int iterations = 6;	
-	
-	int nFacets = 0;
 
 	glswInit();
 	glswSetPath("../resources/", ".glsl");
 	WRender::SetClearColour(0,0,0,0);	
 	WRender::EnableCulling(true);
 	
-	got = glswGetShadersAlt("shaders.Shared+shaders.FlatShading.Vertex", pVertStr, 2);
-	pFragStr = glswGetShaders("shaders.FlatShading.Fragment");
-	CShader vertexShader(CShader::VERT, pVertStr, got);
+	//got = glswGetShadersAlt("Dbg.ScreenSpaceTexture.Vertex", pVertStr, 1);
+	pVertStr[0] = glswGetShaders("shaders.Dbg.ScreenSpaceTexture.Vertex");
+	pFragStr = glswGetShaders("shaders.Dbg.ScreenSpaceTexture.Fragment");
+	CShader vertexShader(CShader::VERT, &pVertStr[0], 1);
 	CShader fragmentShader(CShader::FRAG, &pFragStr, 1);
+
 
 	pVertStr[0] = glswGetShaders("shaders.Post.Vertex");
 	pFragStr = glswGetShaders("shaders.Post.HDR.Luminance.Fragment");
@@ -138,10 +132,17 @@ void Setup(CPlatform * const  pPlatform)
 
 	// - - - - - - - - - - 
 	//setup the textures
-	WRender::Texture::SDescriptor descMain = {WRender::Texture::TEX_2D, WRender::Texture::RGBA16F, RENDER_WIDTH_HEIGHT, RENDER_WIDTH_HEIGHT, 0, 0, WRender::Texture::DONT_GEN_MIPMAP};
-	WRender::Texture::SDescriptor descDepth = {WRender::Texture::TEX_2D, WRender::Texture::DEPTH_COMPONENT, RENDER_WIDTH_HEIGHT, RENDER_WIDTH_HEIGHT, 0, 0, WRender::Texture::DONT_GEN_MIPMAP};
-	WRender::Texture::SDescriptor descDownsample = {WRender::Texture::TEX_2D, WRender::Texture::RGBA16F, TEXTURE_WIDTH_HEIGHT, TEXTURE_WIDTH_HEIGHT, 0, 0, WRender::Texture::GEN_MIPMAP};
+
+	//source dds image
 	WRender::Texture::SDescriptor descImage = {WRender::Texture::TEX_2D, WRender::Texture::RGBA16F, 512, 512, 0, 0, WRender::Texture::DONT_GEN_MIPMAP};
+
+	//1st pass
+	WRender::Texture::SDescriptor descMain = {WRender::Texture::TEX_2D, WRender::Texture::RGBA16F, RENDER_WIDTH, RENDER_HEIGHT, 0, 0, WRender::Texture::DONT_GEN_MIPMAP};
+	WRender::Texture::SDescriptor descDepth = {WRender::Texture::TEX_2D, WRender::Texture::DEPTH_COMPONENT, RENDER_WIDTH, RENDER_HEIGHT, 0, 0, WRender::Texture::DONT_GEN_MIPMAP};
+
+	//2nd pass
+	WRender::Texture::SDescriptor descDownsample = {WRender::Texture::TEX_2D, WRender::Texture::RGBA16F, TEXTURE_WIDTH_HEIGHT, TEXTURE_WIDTH_HEIGHT, 0, 0, WRender::Texture::GEN_MIPMAP};
+	
 
 	WRender::Texture::SParam param[] ={	
 		{ WRender::Texture::MIN_FILTER, WRender::Texture::LINEAR},
@@ -171,9 +172,10 @@ void Setup(CPlatform * const  pPlatform)
 	image.load("../resources/Habib_House_Med.dds");
 	descImage.w = image.get_width();
 	descImage.h = image.get_height();
+
 	WRender::Pixel::Data pixelData = {WRender::Pixel::RGBA, WRender::Pixel::HALF_FLOAT, 0, image};
 	WRender::CreateBaseTextureData( texRGBA16F, descImage, pixelData );
-	WRender::SetTextureParams(texRGB,param,4);
+	WRender::SetTextureParams(texRGBA16F,param,4);
 
 	// - - - - - - - - - - 
 	//setup Frame Buffer
@@ -188,23 +190,6 @@ void Setup(CPlatform * const  pPlatform)
 	WRender::CreateFrameBuffer(downsampled_fbo);
 	WRender::AddTextureRenderBuffer(downsampled_fbo, texDownSample, WRender::ATT_CLR0, 0);
 	WRender::CheckFrameBuffer(downsampled_fbo);
-
-	// - - - - - - - - - - 
-	//set up shapes		
-	//SPHERE
-	nSphereVertices = unsigned int(powl(4.0,long double(iterations)))*8*3;
-	nSphereFloats = nSphereVertices*3;
-	pSphereVertices = new float[nSphereFloats];
-	nFacets = CreateNSphere(pSphereVertices, iterations);
-	vaoSphere = WRender::CreateVertexArrayObject();
-	abSphere = WRender::CreateBuffer(WRender::ARRAY, WRender::STATIC, sizeof(float)*nSphereFloats, pSphereVertices);	
-
-	WRender::BindVertexArrayObject(vaoSphere);
-	WRender::VertexAttribute vaSphere[1] = {
-		{abSphere, 0, 3, WRender::FLOAT, 0, sizeof(float)*3, 0, 0}
-	};
-	WRender::SetAttributeFormat( vaSphere, 1, 0);
-	delete[] pSphereVertices;
 
 	//square
 	sqVao = WRender::CreateVertexArrayObject();	
@@ -225,47 +210,32 @@ void Setup(CPlatform * const  pPlatform)
 	Transform::CreateProjectionMatrix(transforms.proj, -1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 50.0f);
 }
 
-static float white = 0.0f;
+static float key = 0.18f;
 static float smallest_pure_white = 1.0f;
+static bool limited_range = false;
 
 void MainLoop(CPlatform * const  pPlatform)
 {	//update the main application
 	CVec3df cameraPosition(0, 0.0f, -2.1f);
 	pPlatform->Tick();
 
+
 	//- - - - - - - - - - - - - - - - - - - 
 	//first pass to texture
+	WRender::EnableDepthTest(false);
 	{
-		program[0].Start();
-		WRender::SetClearColour(white, white, white,0);
+		WRender::SetClearColour(1.0,0,0,0);
 		WRender::BindFrameBuffer(WRender::FrameBuffer::DRAW, main_fbo);
-		WRender::SetupViewport(0, 0, RENDER_WIDTH_HEIGHT, RENDER_WIDTH_HEIGHT);
+		WRender::SetupViewport(0, 0, RENDER_WIDTH, RENDER_HEIGHT);
 		WRender::ClearScreenBuffer(COLOR_BIT | DEPTH_BIT);
-		WRender::EnableDepthTest(true);
-		transform.Push();			
-		{
-			CMatrix44 rotLat,rotLong;
-			rotLat.Rotate(latitude, 1, 0, 0);
-			rotLong.Rotate(longitude, 0, 1, 0);
 
-			transform.Translate(cameraPosition);
-			transform.ApplyTransform(rotLat);
-			transform.ApplyTransform(rotLong);			
-			
-			transform.Push();					
-			{
-				transforms.mvp = transforms.proj * transform.GetCurrentMatrix();
-				WRender::UpdateBuffer(WRender::UNIFORM, WRender::DYNAMIC, ubo, sizeof(Transforms), (void*)&transforms, 0);				
-				//Sphere
-				WRender::BindVertexArrayObject(vaoSphere);
-				WRender::DrawArray(WRender::TRIANGLES, nSphereVertices, 0);
-			}
-			transform.Pop();
-		}
-		transform.Pop();		
+		program[0].Start();
+		WRender::BindTexture(texRGBA16F, WRender::Texture::UNIT_0);
+		WRender::BindVertexArrayObject( sqVao );		
+		WRender::Draw( WRender::TRIANGLE_STRIP, WRender::U_BYTE, sizeof(sqIndices)/sizeof(unsigned char), 0 );
+
+		WRender::GenerateTextureMipMap(texDownSample); //generate mipmaps
 	}
-	
-	WRender::EnableDepthTest(false); //no longer needed
 
 	//- - - - - - - - - - - - - - - - - - - 
 	//2nd pass, create luminance texture and find log average luminance
@@ -292,53 +262,60 @@ void MainLoop(CPlatform * const  pPlatform)
 	{
 		//texture to screen
 		WRender::SetClearColour(1.0,0,0,0);
-		WRender::SetupViewport(0, 0, RENDER_WIDTH_HEIGHT, RENDER_WIDTH_HEIGHT);
+		WRender::SetupViewport(0, 0, RENDER_WIDTH, RENDER_HEIGHT);
 				
 		program[2].Start();
 		program[2].SetFloat("smallest_pure_white", smallest_pure_white);
+		program[2].SetFloat("key", key);
+		program[2].SetBool("limited_range", limited_range);
 
 		WRender::BindTexture(texRGB,WRender::Texture::UNIT_0);
 		WRender::BindTexture(texDownSample,WRender::Texture::UNIT_1);
 		WRender::BindVertexArrayObject(sqVao);		
 		WRender::Draw(WRender::TRIANGLE_STRIP, WRender::U_BYTE, sizeof(sqIndices)/sizeof(unsigned char), 0);
 	}
+	
+
+	if ( pPlatform->GetKeyboard().keys[KB_1].IsToggledPress() ){
+		limited_range = false;
+		d_printf("using equation 3 : map full range\n");
+	}
+
+	if ( pPlatform->GetKeyboard().keys[KB_2].IsToggledPress() ){
+		limited_range = true;
+		d_printf("using equation 3 : map limited range\n");
+	}
 
 	pPlatform->UpdateBuffers();
-	if(! pPlatform->GetKeyboard().keys[KB_LEFTSHIFT].IsPressed()){
+	if ( !pPlatform->GetKeyboard().keys[KB_LEFTSHIFT].IsPressed() ){
 		if(pPlatform->GetKeyboard().keys[KB_UP].IsPressed()){
-			white += 1.0f * pPlatform->GetDT();
-			d_printf("white:%f\n", white);
-		}
-		if(pPlatform->GetKeyboard().keys[KB_DOWN].IsPressed()){
-			white -= 1.0f * pPlatform->GetDT();
-			if(white < 0.0f)
-				white = 0.0f;
-			d_printf("white:%f\n", white);
-		}
-	}else{
-		if(pPlatform->GetKeyboard().keys[KB_UP].IsPressed()){
-			smallest_pure_white += 1.0f * pPlatform->GetDT();
+			smallest_pure_white += 0.1f * pPlatform->GetDT();
 			d_printf("smallest_pure_white:%f\n", smallest_pure_white);
 		}
 		if(pPlatform->GetKeyboard().keys[KB_DOWN].IsPressed()){
-			smallest_pure_white -= 1.0f * pPlatform->GetDT();
+			smallest_pure_white -= 0.1f * pPlatform->GetDT();
 			if(smallest_pure_white < 0.0f)
 				smallest_pure_white = 0.0f;
 			d_printf("smallest_pure_white:%f\n", smallest_pure_white);
 		}
 	}
-		
-	//if(pPlatform->GetKeyboard().keys[KB_LEFT].IsPressed())//l
-	//	longitude += 90.0f * pPlatform->GetDT();
-	//if(pPlatform->GetKeyboard().keys[KB_RIGHT].IsPressed())//r
-	//	longitude -= 90.0f * pPlatform->GetDT();
+	else{
+		if(pPlatform->GetKeyboard().keys[KB_UP].IsPressed()){
+			key += 0.1f * pPlatform->GetDT();
+			d_printf("key:%f\n", key);
+		}
+		if(pPlatform->GetKeyboard().keys[KB_DOWN].IsPressed()){
+			key -= 0.1f * pPlatform->GetDT();
+			if(key < 0.0f)
+				key = 0.0f;
+			d_printf("key:%f\n", key);
+		}
+	}
 }
 
 void CleanUp(void)
 {	
-	WRender::DeleteVertexArrayObject(vaoSphere);
 	WRender::DeleteBuffer(ubo);
-	WRender::DeleteBuffer(abSphere);
 	
 	WRender::DeleteVertexArrayObject(sqVao);
 	WRender::DeleteBuffer(sqAb);

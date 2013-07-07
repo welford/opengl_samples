@@ -120,10 +120,10 @@ void main()
 #version 420 core
 in vec2 tex;
 out vec4 fragColour;
-uniform sampler2D texture;
+layout(binding=0) uniform sampler2D tex_smp;
 void main()
 {
-	fragColour = texture(texture, tex.st);
+	fragColour = texture(tex_smp, tex.st);
 }
 
 -- SingleShadow.Vertex
@@ -584,7 +584,6 @@ void main()
 	float lum = clr.r*0.3 + clr.g*0.59 + clr.b*0.11;
 	float log_lum = log(0.01 + lum);
 	fragColour = vec4(log_lum, log_lum, log_lum, log_lum);
-	//fragColour = vec4(clr.rgb, clr.a);
 }
 
 -- Post.HDR.VisibleRange.Fragment
@@ -592,14 +591,17 @@ void main()
 #version 420 core
 in vec2 tex;
 out vec4 fragColour;
+
 uniform sampler2D src;
 uniform sampler2D avg_lum;
-uniform float smallest_pure_white;
+
+
+uniform float smallest_pure_white = 1.0f; //smallest pure white luminance
+uniform float key = 0.18;
+uniform bool limited_range = false;
 
 void main()
 {
-	//float key = 1.0;
-	float key = 0.18;
 	vec4 clr = textureLod(src, tex.st,0);
 	float lum = clr.r*0.3 + clr.g*0.59 + clr.b*0.11;
 
@@ -609,10 +611,15 @@ void main()
 	// this is all from the below
 	//http://www.cis.rit.edu/people/faculty/ferwerda/publications/sig02_paper.pdf
 	// equation 3
-	//float ranged_luminance = scaled_luminance/(1+scaled_luminance);
+	float ranged_luminance = 0;
+	if ( ! limited_range ){
+		ranged_luminance = scaled_luminance/(1+scaled_luminance);
+	}
 	// or 
 	// equation 4
-	float ranged_luminance = ((scaled_luminance)*(1 + scaled_luminance/(smallest_pure_white*smallest_pure_white)))/(1+scaled_luminance);
+	else{
+		ranged_luminance = ((scaled_luminance)*(1 + scaled_luminance/(smallest_pure_white*smallest_pure_white)))/(1+scaled_luminance);
+	}
 	
 	//test- - - - - - - - - - - - - - - - - - - - 
 	//fragColour = vec4(average_lug_luminance, average_lug_luminance, average_lug_luminance, clr.a);
@@ -620,6 +627,6 @@ void main()
 	//fragColour = vec4(textureLod(avg_lum, tex.st, 9).rgb, clr.a);	
 	//- - - - - - - - - - - - - - - - - - - - - - 
 
-	fragColour = vec4( pow( clr.rgb * ranged_luminance, vec3(1/2.2) ), clr.a);
+	fragColour = vec4( pow( clr.rgb * (ranged_luminance / lum), vec3(1/2.2) ), clr.a);
 	
 }
