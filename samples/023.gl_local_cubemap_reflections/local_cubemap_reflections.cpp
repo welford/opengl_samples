@@ -5,6 +5,7 @@
 #include <shapes_util.h>
 #include "transforms.h"
 #include "glsw.h"
+#include "debug_print.h"
 
 /*
 Generating vertices for some shapes
@@ -26,10 +27,14 @@ Transforms transforms;
 //buffer for drawing
 unsigned int ubo=0;	
 //amount of vertices to draw
-Shape sphere;
+Shape sphere, cube;
 Shape box;
-CShaderProgram program_sphere;
+
 CShaderProgram program_cube;
+
+CShaderProgram program_local_sphere;
+CShaderProgram program_sphere;
+
 
 #define WIDTH_HEIGHT 16
 WRender::Texture::SObject cubemap_tex;
@@ -137,9 +142,24 @@ void Setup(CPlatform * const  pPlatform)
 	CShader vertexShader1(CShader::VERT, pVertStr, 2);
 	CShader fragmentShader1(CShader::FRAG, pFragStr, 2);	
 	//setup the shaders
+	program_local_sphere.Initialise();
+	program_local_sphere.AddShader(&vertexShader1);
+	program_local_sphere.AddShader(&fragmentShader1);	
+	program_local_sphere.Link();
+
+	program_local_sphere.Start();
+	program_local_sphere.SetTextureUnit("cube_map",0);
+
+	// - - - - - - - - - - - - - - - - - - - -
+	// - - - - - - - - - - - - - - - - - - - -
+	glswGetShadersAlt( "shaders.Shared+shaders.CubemapReflections.Vertex", pVertStr, 2);
+	glswGetShadersAlt( "shaders.Shared+shaders.CubemapReflections.Fragment", pFragStr, 2);
+	CShader vertexShader2(CShader::VERT, pVertStr, 2);
+	CShader fragmentShader2(CShader::FRAG, pFragStr, 2);	
+	//setup the shaders
 	program_sphere.Initialise();
-	program_sphere.AddShader(&vertexShader1);
-	program_sphere.AddShader(&fragmentShader1);	
+	program_sphere.AddShader(&vertexShader2);
+	program_sphere.AddShader(&fragmentShader2);	
 	program_sphere.Link();
 
 	program_sphere.Start();
@@ -149,6 +169,8 @@ void Setup(CPlatform * const  pPlatform)
 	//set up shapes
 	//sphere = CreateShapeSphere();
 	sphere = CreateShapeSphereNormals();
+	cube = CreateShapeCubeNormals();
+
 	box = CreateShapeCube();
 
 	// - - - - - - - - - -
@@ -163,6 +185,10 @@ void Setup(CPlatform * const  pPlatform)
 
 static CVec3df sphere_position( 0.0f, 0.0f, 0.0f );
 static float radius = sqrt((10.0f * 10.0f) + (10.0f * 10.0f));
+
+
+static bool use_local_cubemaps = true;
+static bool use_sphere = true;
 
 void MainLoop(CPlatform * const  pPlatform)
 {	//update the main application
@@ -236,12 +262,20 @@ void MainLoop(CPlatform * const  pPlatform)
 			WRender::UpdateBuffer(WRender::UNIFORM, WRender::DYNAMIC, ubo, sizeof(Transforms), (void*)&transforms, 0);				
 			WRender::EnableCulling(true);			
 			WRender::CullMode(WRender::BACK_FACE);
-			program_sphere.Start();
-			program_sphere.SetMtx44( "inverse_view", inverse_camera.data);
-			program_sphere.SetFloat( "cs_radius", radius );
-			program_sphere.SetVec3( "cs_pos", sphere_position.data );
-			//program_sphere.SetMtx44("model_matrix", model_matrix.data);			
-			DrawShape(sphere);
+			if(use_local_cubemaps){
+				program_local_sphere.Start();
+				program_local_sphere.SetMtx44( "inverse_view", inverse_camera.data);
+				program_local_sphere.SetFloat( "cs_radius", radius );
+				program_local_sphere.SetVec3( "cs_pos", sphere_position.data );
+			}
+			else{
+				program_sphere.Start();				
+				program_sphere.SetMtx44( "inverse_view", inverse_camera.data);
+			}
+			if (use_sphere)
+				DrawShape(sphere);
+			else
+				DrawShape(cube);
 		}
 		//transform_test.Pop();
 		transform.Pop();		
@@ -249,17 +283,23 @@ void MainLoop(CPlatform * const  pPlatform)
 	transform.Pop();		
 
 	pPlatform->UpdateBuffers();
-	if (pPlatform->GetKeyboard().keys[KB_LEFTSHIFT].IsPressed()){
-		if(pPlatform->GetKeyboard().keys[KB_RIGHT].IsPressed())
-			sphere_position.x += 3.0f * pPlatform->GetDT();
-		if(pPlatform->GetKeyboard().keys[KB_LEFT].IsPressed())
-			sphere_position.x -= 3.0f * pPlatform->GetDT();
+	if (pPlatform->GetKeyboard().keys[KB_1].IsToggledPress()){
+		use_local_cubemaps = true;
+		d_printf("using local cubemaps\n");
+	}
+	else if (pPlatform->GetKeyboard().keys[KB_2].IsToggledPress()){
+		use_local_cubemaps = false;
+		d_printf("using normal cubemaps\n");
+	}
 
-		if(pPlatform->GetKeyboard().keys[KB_UP].IsPressed())
-			sphere_position.y += 3.0f * pPlatform->GetDT();
-		if(pPlatform->GetKeyboard().keys[KB_DOWN].IsPressed())
-			sphere_position.y -= 3.0f * pPlatform->GetDT();
-	}else{
+	if (pPlatform->GetKeyboard().keys[KB_3].IsToggledPress()){
+		use_sphere = true;
+	}
+	else if (pPlatform->GetKeyboard().keys[KB_4].IsToggledPress()){
+		use_sphere = false;
+	}
+
+	if (pPlatform->GetKeyboard().keys[KB_LEFTSHIFT].IsPressed()){		
 		if(pPlatform->GetKeyboard().keys[KB_UP].IsPressed())
 			latitude += 90.0f * pPlatform->GetDT();
 		if(pPlatform->GetKeyboard().keys[KB_DOWN].IsPressed())
@@ -269,6 +309,16 @@ void MainLoop(CPlatform * const  pPlatform)
 			longitude += 90.0f * pPlatform->GetDT();
 		if(pPlatform->GetKeyboard().keys[KB_RIGHT].IsPressed())//r
 			longitude -= 90.0f * pPlatform->GetDT();
+	}else{
+		if(pPlatform->GetKeyboard().keys[KB_RIGHT].IsPressed())
+			sphere_position.x += 3.0f * pPlatform->GetDT();
+		if(pPlatform->GetKeyboard().keys[KB_LEFT].IsPressed())
+			sphere_position.x -= 3.0f * pPlatform->GetDT();
+
+		if(pPlatform->GetKeyboard().keys[KB_UP].IsPressed())
+			sphere_position.y += 3.0f * pPlatform->GetDT();
+		if(pPlatform->GetKeyboard().keys[KB_DOWN].IsPressed())
+			sphere_position.y -= 3.0f * pPlatform->GetDT();
 	}
 }
 
@@ -276,10 +326,12 @@ void CleanUp(void)
 {	
 	WRender::DeleteBuffer(ubo);
 	DestroyShape(sphere);
+	DestroyShape(cube);
 	DestroyShape(box);
 	WRender::DeleteTexture( cubemap_tex );	
 
 	program_cube.CleanUp();
+	program_local_sphere.CleanUp();
 	program_sphere.CleanUp();
 
 	glswShutdown();

@@ -402,7 +402,7 @@ void main()
 -- LocalCubemapReflections.Vertex
 
 out vec3 colour;
-out vec3 eye_dir;
+out vec4 eye_dir;
 out vec3 normal;
 
 uniform mat4 inverse_view = mat4(1.0f);
@@ -413,7 +413,7 @@ void main()
 	vec4 pos;
 	colour = inColour;	
 	pos = trans.mv * vec4(inVertex, 1);
-	eye_dir = normalize(pos.xyz/pos.w);
+	eye_dir = pos;//normalize(pos.xyz/pos.w);
 	normal = normalize((trans.nrmn * vec4(inNormal, 0)).xyz);
 	gl_Position = trans.mvp * vec4(inVertex,1);
 }
@@ -424,15 +424,16 @@ uniform samplerCube cube_map;
 uniform mat4 inverse_view = mat4( 1.0 );
 uniform vec3 cs_pos = vec3( -5.0, 0, 0 );
 uniform float cs_radius = 10.0;
-in vec3 eye_dir;
+in vec4 eye_dir;
 in vec3 normal;
 
 out vec4 fragColour;
 
 void main()
 {
-	vec3 cubemap_lookup = reflect( eye_dir,  normal );
+	vec3 cubemap_lookup = reflect( normalize(eye_dir.xyz/eye_dir.w),  normal );
 	vec3 ws_cubemap_lookup = ( inverse_view * vec4( cubemap_lookup, 0 ) ).xyz;	//bascially in cube space, which is world space
+
 
 	//ray segment vs sphere
 	//	where 
@@ -468,7 +469,6 @@ void main()
 	if (hasIntersects) {
 		// determine where on the unit sphere reflVect intersects
 		ws_cubemap_lookup = nearT * ws_cubemap_lookup + cs_pos;
-
 		// reflVect.y = -reflVect.y; // optional - see text
 		// now use the new intersection location as the 3D direction
 		cube_map_colour = texture( cube_map, ws_cubemap_lookup);
