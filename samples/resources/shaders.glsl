@@ -421,8 +421,9 @@ void main()
 -- LocalCubemapReflections.Fragment
 
 uniform samplerCube cube_map;
-uniform mat4 inverse_view = mat4(1.0f);
-
+uniform mat4 inverse_view = mat4( 1.0 );
+uniform vec3 cs_pos = vec3( -5.0, 0, 0 );
+uniform float cs_radius = 10.0;
 in vec3 eye_dir;
 in vec3 normal;
 
@@ -431,9 +432,7 @@ out vec4 fragColour;
 void main()
 {
 	vec3 cubemap_lookup = reflect( eye_dir,  normal );
-	vec3 ws_cubemap_lookup = ( inverse_view * vec4(cubemap_lookup, 0) ).xyz;	//bascially in Cube Space
-
-	vec3 cs_pos = vec3(9.0, 0, 0);
+	vec3 ws_cubemap_lookup = ( inverse_view * vec4( cubemap_lookup, 0 ) ).xyz;	//bascially in cube space, which is world space
 
 	//ray segment vs sphere
 	//	where 
@@ -447,14 +446,14 @@ void main()
 	// b = 2(m.d) 	
 	// c = m.m - r^2
 
-	float b = 2.0 * dot( ws_cubemap_lookup, cs_pos );
-	float c = dot( cs_pos, cs_pos ) - 1.0*1.0;
+	float b = 2.0 * dot( -ws_cubemap_lookup, -cs_pos );
+	float c = dot( -cs_pos, -cs_pos ) - cs_radius*cs_radius;
 	float discrim = b * b - 4.0 * c;
 	bool hasIntersects = false;
 	
 	//vec4 reflColor = vec4(1, 0, 0, 0);
 	float nearT = 0;
-	vec4 cube_map_colour = vec4(1, 0, 0, 0);
+	vec4 cube_map_colour = vec4(1, 1, 1, 0);
 
 	if (discrim > 0) {
 		// pick a small error value very close to zero as "epsilon"
@@ -468,7 +467,7 @@ void main()
 	}
 	if (hasIntersects) {
 		// determine where on the unit sphere reflVect intersects
-		ws_cubemap_lookup = nearT * ws_cubemap_lookup - cs_pos;
+		ws_cubemap_lookup = nearT * ws_cubemap_lookup + cs_pos;
 		// reflVect.y = -reflVect.y; // optional - see text
 		// now use the new intersection location as the 3D direction
 		cube_map_colour = texture( cube_map, ws_cubemap_lookup);

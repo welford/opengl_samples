@@ -213,8 +213,9 @@ void Setup(CPlatform * const  pPlatform)
 	Transform::CreateProjectionMatrix(transforms.proj, -1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 50.0f);
 }
 
-static float white = 0.0f;
+static float white = 1.0f;
 static float smallest_pure_white = 1.0f;
+static bool limited_range = true;
 
 void MainLoop(CPlatform * const  pPlatform)
 {	//update the main application
@@ -284,6 +285,7 @@ void MainLoop(CPlatform * const  pPlatform)
 				
 		program[2].Start();
 		program[2].SetFloat("smallest_pure_white", smallest_pure_white);
+		program[2].SetBool("limited_range", limited_range);
 
 		WRender::BindTexture(texRGB,WRender::Texture::UNIT_0);
 		WRender::BindTexture(texDownSample,WRender::Texture::UNIT_1);
@@ -292,6 +294,17 @@ void MainLoop(CPlatform * const  pPlatform)
 	}
 
 	pPlatform->UpdateBuffers();
+
+	if ( pPlatform->GetKeyboard().keys[KB_1].IsToggledPress() ){
+		limited_range = false;
+		d_printf("using equation 3 : map full range\n");
+	}
+
+	if ( pPlatform->GetKeyboard().keys[KB_2].IsToggledPress() ){
+		limited_range = true;
+		d_printf("using equation 3 : map limited range\n");
+	}
+
 	if(! pPlatform->GetKeyboard().keys[KB_LEFTSHIFT].IsPressed()){
 		if(pPlatform->GetKeyboard().keys[KB_UP].IsPressed()){
 			white += 1.0f * pPlatform->GetDT();

@@ -275,7 +275,6 @@ void MainLoop(CPlatform * const  pPlatform)
 		WRender::Draw(WRender::TRIANGLE_STRIP, WRender::U_BYTE, sizeof(sqIndices)/sizeof(unsigned char), 0);
 	}
 	
-
 	if ( pPlatform->GetKeyboard().keys[KB_1].IsToggledPress() ){
 		limited_range = false;
 		d_printf("using equation 3 : map full range\n");

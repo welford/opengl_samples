@@ -161,10 +161,13 @@ void Setup(CPlatform * const  pPlatform)
 	Transform::CreateProjectionMatrix(transforms.proj, -0.1f, 0.1f, -0.1f, 0.1f, 0.1f, 50.0f);
 }
 
+static CVec3df sphere_position( 0.0f, 0.0f, 0.0f );
+static float radius = sqrt((10.0f * 10.0f) + (10.0f * 10.0f));
+
 void MainLoop(CPlatform * const  pPlatform)
 {	//update the main application
 	CVec3df cameraPosition( 0.0f, 0.0f, distance );
-	CVec3df sphere_position( 9.0f, 0.0f, 0.0f );
+	//CVec3df sphere_position( 9.0f, 0.0f, 0.0f );
 
 	pPlatform->Tick();	
 	WRender::ClearScreenBuffer(COLOR_BIT | DEPTH_BIT);
@@ -216,14 +219,9 @@ void MainLoop(CPlatform * const  pPlatform)
 
 		transform_test.Identity();
 
-		//transform_test.Push();
 		transform.Push();					
 		{
-			//transform_test.Translate(0.0f, 0, 0);
 			transform.Translate(sphere_position);
-
-			//model_matrix = transform_test.GetCurrentMatrix();
-
 			transforms.mv = transform.GetCurrentMatrix();
 			transforms.mvp = transforms.proj * transforms.mv;
 			CMatrix33 normal;
@@ -239,7 +237,9 @@ void MainLoop(CPlatform * const  pPlatform)
 			WRender::EnableCulling(true);			
 			WRender::CullMode(WRender::BACK_FACE);
 			program_sphere.Start();
-			program_sphere.SetMtx44("inverse_view", inverse_camera.data);
+			program_sphere.SetMtx44( "inverse_view", inverse_camera.data);
+			program_sphere.SetFloat( "cs_radius", radius );
+			program_sphere.SetVec3( "cs_pos", sphere_position.data );
 			//program_sphere.SetMtx44("model_matrix", model_matrix.data);			
 			DrawShape(sphere);
 		}
@@ -250,10 +250,15 @@ void MainLoop(CPlatform * const  pPlatform)
 
 	pPlatform->UpdateBuffers();
 	if (pPlatform->GetKeyboard().keys[KB_LEFTSHIFT].IsPressed()){
+		if(pPlatform->GetKeyboard().keys[KB_RIGHT].IsPressed())
+			sphere_position.x += 3.0f * pPlatform->GetDT();
+		if(pPlatform->GetKeyboard().keys[KB_LEFT].IsPressed())
+			sphere_position.x -= 3.0f * pPlatform->GetDT();
+
 		if(pPlatform->GetKeyboard().keys[KB_UP].IsPressed())
-			distance += 1.0f * pPlatform->GetDT();
+			sphere_position.y += 3.0f * pPlatform->GetDT();
 		if(pPlatform->GetKeyboard().keys[KB_DOWN].IsPressed())
-			distance -= 1.0f * pPlatform->GetDT();
+			sphere_position.y -= 3.0f * pPlatform->GetDT();
 	}else{
 		if(pPlatform->GetKeyboard().keys[KB_UP].IsPressed())
 			latitude += 90.0f * pPlatform->GetDT();
