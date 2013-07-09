@@ -446,14 +446,14 @@ void main()
 	// b = 2(m.d) 	
 	// c = m.m - r^2
 
-	float b = 2.0 * dot( -ws_cubemap_lookup, -cs_pos );
-	float c = dot( -cs_pos, -cs_pos ) - cs_radius*cs_radius;
+	float b = 2.0 * dot( ws_cubemap_lookup, cs_pos );
+	float c = dot( cs_pos, cs_pos ) - cs_radius*cs_radius;
 	float discrim = b * b - 4.0 * c;
 	bool hasIntersects = false;
 	
 	//vec4 reflColor = vec4(1, 0, 0, 0);
 	float nearT = 0;
-	vec4 cube_map_colour = vec4(1, 1, 1, 0);
+	vec4 cube_map_colour = vec4(0, 0, 0, 0);
 
 	if (discrim > 0) {
 		// pick a small error value very close to zero as "epsilon"
@@ -468,6 +468,7 @@ void main()
 	if (hasIntersects) {
 		// determine where on the unit sphere reflVect intersects
 		ws_cubemap_lookup = nearT * ws_cubemap_lookup + cs_pos;
+
 		// reflVect.y = -reflVect.y; // optional - see text
 		// now use the new intersection location as the 3D direction
 		cube_map_colour = texture( cube_map, ws_cubemap_lookup);
