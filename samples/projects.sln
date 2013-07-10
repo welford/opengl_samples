@@ -137,6 +137,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "022.gl_local_cubemap_reflec
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "020a.gl_high_dynamic_range", "020a.gl_high_dynamic_range_image\020a.gl_high_dynamic_range.vcxproj", "{E3FA6745-9467-49A8-B5BF-70287E564BC6}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "022.gl_local_cubemap_reflections_aabb", "023a.gl_local_cubemap_reflections_aabb\gl_local_cubemap_reflections_aabb.vcxproj", "{908E0FA0-F63F-49E4-96F0-00C80073266F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug MX|Win32 = Debug MX|Win32
@@ -369,6 +371,14 @@ Global
 		{E3FA6745-9467-49A8-B5BF-70287E564BC6}.Release MX|Win32.Build.0 = Release|Win32
 		{E3FA6745-9467-49A8-B5BF-70287E564BC6}.Release|Win32.ActiveCfg = Release|Win32
 		{E3FA6745-9467-49A8-B5BF-70287E564BC6}.Release|Win32.Build.0 = Release|Win32
+		{908E0FA0-F63F-49E4-96F0-00C80073266F}.Debug MX|Win32.ActiveCfg = Debug|Win32
+		{908E0FA0-F63F-49E4-96F0-00C80073266F}.Debug MX|Win32.Build.0 = Debug|Win32
+		{908E0FA0-F63F-49E4-96F0-00C80073266F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{908E0FA0-F63F-49E4-96F0-00C80073266F}.Debug|Win32.Build.0 = Debug|Win32
+		{908E0FA0-F63F-49E4-96F0-00C80073266F}.Release MX|Win32.ActiveCfg = Release|Win32
+		{908E0FA0-F63F-49E4-96F0-00C80073266F}.Release MX|Win32.Build.0 = Release|Win32
+		{908E0FA0-F63F-49E4-96F0-00C80073266F}.Release|Win32.ActiveCfg = Release|Win32
+		{908E0FA0-F63F-49E4-96F0-00C80073266F}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

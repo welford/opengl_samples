@@ -138,7 +138,7 @@ void Setup(CPlatform * const  pPlatform)
 	// - - - - - - - - - - - - - - - - - - - -
 	// - - - - - - - - - - - - - - - - - - - -
 	glswGetShadersAlt( "shaders.Shared+shaders.LocalCubemapReflections.Vertex", pVertStr, 2);
-	glswGetShadersAlt( "shaders.Shared+shaders.LocalCubemapReflections.Fragment", pFragStr, 2);
+	glswGetShadersAlt( "shaders.Shared+shaders.LocalCubemapReflectionsAABB.Fragment", pFragStr, 2);
 	CShader vertexShader1(CShader::VERT, pVertStr, 2);
 	CShader fragmentShader1(CShader::FRAG, pFragStr, 2);	
 	//setup the shaders
@@ -184,9 +184,12 @@ void Setup(CPlatform * const  pPlatform)
 }
 
 static const float size = 10.0f;
-static CVec3df cubemap_position( 0.0f, 0.0f, 0.0f );
 static CVec3df sphere_position( 0.0f, 0.0f, 0.0f );
 static float radius = sqrt((size * size) + (size * size));
+
+static CVec3df min( -size );
+static CVec3df max( size );
+
 
 
 static bool use_local_cubemaps = true;
@@ -225,8 +228,7 @@ void MainLoop(CPlatform * const  pPlatform)
 
 		transform.Push();					
 		{
-			transform.Translate(cubemap_position);
-			transform.Scale(size, size, size);
+			transform.Scale( size, size, size );
 			transforms.mv = transform.GetCurrentMatrix();
 			transforms.mvp = transforms.proj * transforms.mv;
 			CMatrix33 normal;
@@ -258,6 +260,7 @@ void MainLoop(CPlatform * const  pPlatform)
 			transform.ApplyTransform(rotY);		
 			rotation += 3.0f* pPlatform->GetDT();
 			*/
+
 			transforms.mv = transform.GetCurrentMatrix();
 			transforms.mvp = transforms.proj * transforms.mv;
 			CMatrix33 normal;
@@ -276,7 +279,10 @@ void MainLoop(CPlatform * const  pPlatform)
 				program_local_sphere.Start();
 				program_local_sphere.SetMtx44( "inverse_view", inverse_camera.data);
 				program_local_sphere.SetFloat( "cs_radius", radius );
-				program_local_sphere.SetVec3( "cs_pos", (sphere_position-cubemap_position).data );
+				program_local_sphere.SetVec3( "cs_pos", sphere_position.data );
+
+				program_local_sphere.SetVec3( "cs_min", min.data );
+				program_local_sphere.SetVec3( "cs_max", max.data );
 			}
 			else{
 				program_sphere.Start();				
