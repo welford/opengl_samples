@@ -336,3 +336,24 @@ void CleanUp(void)
 
 	glswShutdown();
 }
+
+/*
+int IntersectionRayAABB(point p, vector d, AABB a){
+	float tmin = 0;
+
+	if (abs(d[i] < epsilon){
+			if(p[i] < a.min[i] || p[i] > a.max[i])return 0;
+		}
+		else{
+			float ood = 1.0f/d[i];
+			float t1 = (a.min[i] - p[i]) * ood;
+			float t2 = (a.max[i] - p[i]) * ood;
+			if(t1 > t2)Swap(t1,t2);
+			tmin = Max(tmin,t1);
+			tmax = Min(tmax,t2);
+			if(tmin > tmax)return 0;
+		}
+	}
+	q = p + d * tmin;
+}
+*/
