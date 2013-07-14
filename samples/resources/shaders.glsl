@@ -405,6 +405,9 @@ out vec3 colour;
 out vec4 eye_dir;
 out vec3 normal;
 
+out vec3 ms_pos;
+
+uniform vec3 cs_pos = vec3( -5.0, 0, 0 );
 uniform mat4 inverse_view = mat4(1.0f);
 uniform mat4 model_matrix = mat4(1.0f);
 
@@ -412,8 +415,8 @@ void main()
 {
 	vec4 pos;
 	colour = inColour;	
-	pos = trans.mv * vec4(inVertex, 1);
-	eye_dir = pos;//normalize(pos.xyz/pos.w);
+	ms_pos = cs_pos + inVertex;
+	eye_dir = trans.mv * vec4(inVertex, 1);
 	normal = normalize((trans.nrmn * vec4(inNormal, 0)).xyz);
 	gl_Position = trans.mvp * vec4(inVertex,1);
 }
@@ -422,10 +425,11 @@ void main()
 
 uniform samplerCube cube_map;
 uniform mat4 inverse_view = mat4( 1.0 );
-uniform vec3 cs_pos = vec3( -5.0, 0, 0 );
 uniform float cs_radius = 10.0;
+
 in vec4 eye_dir;
 in vec3 normal;
+in vec3 ms_pos;
 
 out vec4 fragColour;
 
@@ -434,9 +438,11 @@ void main()
 	vec3 cubemap_lookup = reflect( normalize(eye_dir.xyz/eye_dir.w),  normal );
 	vec3 ws_cubemap_lookup = ( inverse_view * vec4( cubemap_lookup, 0 ) ).xyz;	//cube space, which is bascially world space
 
+	vec3 ws_pos = (inverse_view * vec4( eye_dir.xyz/eye_dir.w, 1 )).xyz;
+
 	//ray segment vs sphere
 	//	where 
-	//	- m is start of ray(P) minus the center of the circle (C), P-C (P = object position, C = cubemap position, all in world space. passed in precalculated as cs_pos)
+	//	- m is start of ray(P) minus the center of the circle (C), P-C (P = object position, C = cubemap position, all in world space. passed in precalculated as ws_pos)
 	//	- d is the normalized direction of the ray ( d is ws_cubemap_lookup)
 	//	- t is the length along the ray 
 	//	- r is the radius of the circle
@@ -446,8 +452,8 @@ void main()
 	// b = 2(m.d) 	
 	// c = m.m - r^2
 
-	float b = 2.0 * dot( cs_pos, ws_cubemap_lookup );
-	float c = dot( cs_pos, cs_pos ) - cs_radius*cs_radius;
+	float b = 2.0 * dot( ws_pos, ws_cubemap_lookup );
+	float c = dot( ws_pos, ws_pos ) - cs_radius*cs_radius;
 	float discrim = b * b - 4.0 * c;
 	bool hasIntersects = false;
 	
@@ -467,7 +473,7 @@ void main()
 	}
 	if (hasIntersects) {
 		// determine where on the unit sphere reflVect intersects
-		ws_cubemap_lookup = cs_pos + (nearT * ws_cubemap_lookup);
+		ws_cubemap_lookup = ws_pos + (nearT * ws_cubemap_lookup);
 		//ws_cubemap_lookup.y = -ws_cubemap_lookup.y; // optional - see text
 		// now use the new intersection location as the 3D direction
 		cube_map_colour = texture( cube_map, ws_cubemap_lookup);
@@ -481,11 +487,13 @@ void main()
 uniform samplerCube cube_map;
 uniform mat4 inverse_view = mat4( 1.0 );
 
-uniform vec3 cs_pos = vec3( -5.0, 0, 0 );
+uniform vec3 cs_min = vec3(-1,-1,-1);
+uniform vec3 cs_max = vec3( 1, 1, 1);
 uniform float cs_radius = 10.0;
 
 in vec4 eye_dir;
 in vec3 normal;
+in vec3 ms_pos;
 
 out vec4 fragColour;
 
@@ -494,45 +502,73 @@ void main()
 	vec3 cubemap_lookup = reflect( normalize(eye_dir.xyz/eye_dir.w),  normal );
 	vec3 ws_cubemap_lookup = ( inverse_view * vec4( cubemap_lookup, 0 ) ).xyz;	//bascially in cube space, which is world space
 
+	vec3 ws_pos = (inverse_view * vec4( eye_dir.xyz/eye_dir.w, 1 )).xyz;
 
-	//ray segment vs sphere
-	//	where 
-	//	- m is start of ray(P) minus the center of the circle (C), P-C 
-	//	- d is the normalized direction of the ray
-	//	- t is the length along the ray 
-	//	- r is the radius of the circle
-	// t^2 + 2(m.d)t + (m.m) - r^2 = 0
-	// which is quadratic equation with the terms
-	// a = t^2
-	// b = 2(m.d) 	
-	// c = m.m - r^2
-
-	float b = 2.0 * dot( ws_cubemap_lookup, cs_pos );
-	float c = dot( cs_pos, cs_pos ) - cs_radius*cs_radius;
-	float discrim = b * b - 4.0 * c;
-	bool hasIntersects = false;
-	
-	//vec4 reflColor = vec4(1, 0, 0, 0);
-	float nearT = 0;
+	vec3 final_cubemap_lookup = cubemap_lookup;
 	vec4 cube_map_colour = vec4(0, 0, 0, 0);
 
-	if (discrim > 0) {
-		// pick a small error value very close to zero as "epsilon"
-		discrim = sqrt(discrim);
-		nearT = -(discrim-b)/2.0f;
-		//hasIntersects = true;//((abs(sqrt(discrim) - b) / 2.0) > 0.00001);
-		if(nearT <= 0.0001){
-			nearT = (discrim - b)/2.0f;
-			hasIntersects = (nearT > 0.0001) ? true : false;
-		}
+	//ray segment vs AABB 
+	//ray = P + tD, where p is the origin of the Ray, D is a direction vector of the ray and t is a distance from P along D
+	//AABB is defined as 6 planes, 
+	//plane: X.n = d, where X is a point on the plane, n is the (normalized) normal to the plane and d is the distance of the plane from the origin
+
+	// The ray and plane intersect at 
+	// (P+tD) . n = d (substituting the ray for X)
+	// we want to solve for the only unknown which is t, i.e how far along the ray is the intersections
+	// we can rewrite this as
+	// (P.n) + (tD.n) = d
+	// t(D.n) = d-(P.n)
+	// t = (d-(P.n)) / D.n
+
+	//P is ws_pos
+	//D is ws_cubemap_lookup
+	//n is the normal to the slabs 
+
+	//since an AABB is aligned to the world axis we can cut down on some of the maths as
+	//two elements of any given normal will be 0, and since it is normalized then product of 
+	//D.n is just Dx, Dy or Dz depending on the normal
+
+	float EPSILON = 0.00001;
+
+	vec3 nrdir = 1.0f / ws_cubemap_lookup;		
+	vec3 rbmax = (cs_max - ws_pos) * nrdir;
+	vec3 rbmin = (cs_min - ws_pos) * nrdir;	
+	vec3 rbminmax;
+	rbminmax.x = (ws_cubemap_lookup.x>0.0)?rbmax.x:rbmin.x;
+	rbminmax.y = (ws_cubemap_lookup.y>0.0)?rbmax.y:rbmin.y;
+	rbminmax.z = (ws_cubemap_lookup.z>0.0)?rbmax.z:rbmin.z;		
+	float fa = min(min(rbminmax.x, rbminmax.y), rbminmax.z);
+	final_cubemap_lookup = ws_pos + ws_cubemap_lookup * fa;	
+	
+	/*
+	//X axis 
+	if ( abs(ws_cubemap_lookup.x) < EPSILON ){
+		if( cs_pos.x < cs_min.x || cs_pos.x > cs_max.x ){
+			final_cubemap_lookup = cubemap_lookup;
+		}			
 	}
-	if (hasIntersects) {
-		// determine where on the unit sphere reflVect intersects
-		ws_cubemap_lookup = nearT * ws_cubemap_lookup + cs_pos;
-		// reflVect.y = -reflVect.y; // optional - see text
-		// now use the new intersection location as the 3D direction
-		cube_map_colour = texture( cube_map, ws_cubemap_lookup);
+	else{
+		float ood = 1.0f / ws_cubemap_lookup.x;
+		float _t1 = ( cs_min.x - cs_pos.x ) * ood;
+		float _t2 = ( cs_max.x - cs_pos.x ) * ood;
+		float t1 = min(_t1,_t2);
+		float t2 = min(_t2,_t1);
 	}
+	//Y axis 
+	if ( abs(ws_cubemap_lookup.x) < EPSILON ){
+			
+	}
+	else{
+	}
+	//Z axis 
+	if ( abs(ws_cubemap_lookup.x) < EPSILON ){
+			
+	}
+	else{
+	}
+	*/
+	
+	cube_map_colour = texture( cube_map, final_cubemap_lookup);
 	//vec4 cube_map_colour = texture( cube_map, ws_cubemap_lookup);
 	fragColour = vec4(cube_map_colour.rgb, 1);	
 }

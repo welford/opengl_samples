@@ -185,7 +185,7 @@ void Setup(CPlatform * const  pPlatform)
 
 static const float size = 10.0f;
 static CVec3df cubemap_position( 0.0f, 0.0f, 0.0f );
-static CVec3df sphere_position( 0.0f, 0.0f, 0.0f );
+static CVec3df sphere_position( -9.0f, -9.0f, 0.0f );
 static float radius = sqrt((size * size) + (size * size));
 
 

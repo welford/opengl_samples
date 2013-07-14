@@ -184,21 +184,19 @@ void Setup(CPlatform * const  pPlatform)
 }
 
 static const float size = 10.0f;
-static CVec3df sphere_position( 0.0f, 0.0f, 0.0f );
 static float radius = sqrt((size * size) + (size * size));
+static CVec3df object_position( -9.0f, -9.0f, 0.0f );
 
-static CVec3df min( -size );
-static CVec3df max( size );
-
-
+static CVec3df background_position( 0.0f, 0.0f, 0.0f );
+static CVec3df min( background_position-size );
+static CVec3df max( background_position+size );
 
 static bool use_local_cubemaps = true;
-static bool use_sphere = true;
+static bool use_sphere = false;
 
 void MainLoop(CPlatform * const  pPlatform)
 {	//update the main application
 	CVec3df cameraPosition( 0.0f, 0.0f, distance );
-	//CVec3df sphere_position( 9.0f, 0.0f, 0.0f );
 
 	pPlatform->Tick();	
 	WRender::ClearScreenBuffer(COLOR_BIT | DEPTH_BIT);
@@ -218,13 +216,10 @@ void MainLoop(CPlatform * const  pPlatform)
 		transform.Translate(cameraPosition);
 		transform.ApplyTransform(rotLat);
 		transform.ApplyTransform(rotLong);		
-		transform.Translate( -sphere_position );
+		transform.Translate( -object_position ); //centre on object
 
 		inverse_camera = transform.GetCurrentMatrix();		
 		inverse_camera = inverse_camera.InvertSimple();
-
-		//sphere_position = inverse_camera * sphere_position;
-		//transform.Translate(sphere_position);
 
 		transform.Push();					
 		{
@@ -252,14 +247,13 @@ void MainLoop(CPlatform * const  pPlatform)
 
 		transform.Push();					
 		{
-			transform.Translate(sphere_position);
-			/*
+			transform.Translate(object_position);
+			
 			static float rotation = 0;
 			CMatrix44 rotY;
 			rotY.Rotate(rotation, 0, 1, 0);
 			transform.ApplyTransform(rotY);		
 			rotation += 3.0f* pPlatform->GetDT();
-			*/
 
 			transforms.mv = transform.GetCurrentMatrix();
 			transforms.mvp = transforms.proj * transforms.mv;
@@ -278,8 +272,10 @@ void MainLoop(CPlatform * const  pPlatform)
 			if(use_local_cubemaps){
 				program_local_sphere.Start();
 				program_local_sphere.SetMtx44( "inverse_view", inverse_camera.data);
-				program_local_sphere.SetFloat( "cs_radius", radius );
-				program_local_sphere.SetVec3( "cs_pos", sphere_position.data );
+				program_local_sphere.SetVec3( "cs_pos", object_position.data );
+
+				min = background_position-size;
+				max = background_position+size;
 
 				program_local_sphere.SetVec3( "cs_min", min.data );
 				program_local_sphere.SetVec3( "cs_max", max.data );
@@ -327,14 +323,14 @@ void MainLoop(CPlatform * const  pPlatform)
 			longitude -= 90.0f * pPlatform->GetDT();
 	}else{
 		if(pPlatform->GetKeyboard().keys[KB_RIGHT].IsPressed())
-			sphere_position.x += 3.0f * pPlatform->GetDT();
+			object_position.x += 3.0f * pPlatform->GetDT();
 		if(pPlatform->GetKeyboard().keys[KB_LEFT].IsPressed())
-			sphere_position.x -= 3.0f * pPlatform->GetDT();
+			object_position.x -= 3.0f * pPlatform->GetDT();
 
 		if(pPlatform->GetKeyboard().keys[KB_UP].IsPressed())
-			sphere_position.y += 3.0f * pPlatform->GetDT();
+			object_position.y += 3.0f * pPlatform->GetDT();
 		if(pPlatform->GetKeyboard().keys[KB_DOWN].IsPressed())
-			sphere_position.y -= 3.0f * pPlatform->GetDT();
+			object_position.y -= 3.0f * pPlatform->GetDT();
 	}
 }
 
