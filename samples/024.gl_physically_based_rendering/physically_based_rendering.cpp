@@ -21,7 +21,7 @@ typedef struct {
 CPlatform* pPlatform = 0;
 Transform transform(10);
 Transform transform_test(10);
-float latitude = 0.0f, longitude = 0.0f, distance = -3.0f;
+float latitude = 45.0f, longitude = -45.0f, distance = -3.0f;
 Transforms transforms;
 
 //buffer for drawing
@@ -36,7 +36,7 @@ CShaderProgram program_local_sphere;
 CShaderProgram program_sphere;
 
 
-#define WIDTH_HEIGHT 16
+#define WIDTH_HEIGHT 8
 WRender::Texture::SObject cubemap_tex;
 WRender::Texture::Type cube_map_type[6] = {
 	WRender::Texture::TEX_CUBE_MAP_POSITIVE_X,
@@ -92,7 +92,7 @@ void CreateCubeMapTextures(){
 		{
 			for(unsigned int w=0;w<WIDTH_HEIGHT;w++)
 			{
-				float height_scale = float(h)/float(WIDTH_HEIGHT);
+				float height_scale = 1;//float(h)/float(WIDTH_HEIGHT);
 				pTexture[(h*WIDTH_HEIGHT*3)+(w*3)+0] = cubemap_clr[i][0]*height_scale;//*w_mod;	//R
 				pTexture[(h*WIDTH_HEIGHT*3)+(w*3)+1] = cubemap_clr[i][1]*height_scale;//*w_mod;	//G
 				pTexture[(h*WIDTH_HEIGHT*3)+(w*3)+2] = cubemap_clr[i][2]*height_scale;//*w_mod;	//B
@@ -138,7 +138,7 @@ void Setup(CPlatform * const  pPlatform)
 	// - - - - - - - - - - - - - - - - - - - -
 	// - - - - - - - - - - - - - - - - - - - -
 	glswGetShadersAlt( "shaders.Shared+shaders.LocalCubemapReflections.Vertex", pVertStr, 2);
-	glswGetShadersAlt( "shaders.Shared+shaders.LocalCubemapReflectionsAABB.Fragment", pFragStr, 2);
+	glswGetShadersAlt( "shaders.Shared+shaders.PhysicallyBasedRendering.Fragment", pFragStr, 2);
 	CShader vertexShader1(CShader::VERT, pVertStr, 2);
 	CShader fragmentShader1(CShader::FRAG, pFragStr, 2);	
 	//setup the shaders
@@ -180,8 +180,7 @@ void Setup(CPlatform * const  pPlatform)
 	//ubo for cameras etc
 	ubo = WRender::CreateBuffer(WRender::UNIFORM, WRender::DYNAMIC, sizeof(Transforms), &transform);
 	WRender::BindBufferToIndex(WRender::UNIFORM, ubo, 1);
-	float temp = 1080.0f/1920.0f;
-	Transform::CreateProjectionMatrix(transforms.proj, -0.1f, 0.1f, -0.1f*temp, 0.1f*temp, 0.1f, 50.0f);
+	Transform::CreateProjectionMatrix(transforms.proj, -0.1f, 0.1f, -0.1f, 0.1f, 0.1f, 50.0f);
 }
 
 static const float size = 10.0f;
@@ -193,7 +192,7 @@ static CVec3df min( background_position-size );
 static CVec3df max( background_position+size );
 
 static bool use_local_cubemaps = true;
-static bool use_sphere = false;
+static bool use_sphere = true;
 
 void MainLoop(CPlatform * const  pPlatform)
 {	//update the main application

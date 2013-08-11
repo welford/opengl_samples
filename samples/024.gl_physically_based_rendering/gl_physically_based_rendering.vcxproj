@@ -11,10 +11,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{DC2AE4C5-F763-45BD-8696-E86488273639}</ProjectGuid>
+    <ProjectGuid>{88B019D3-21CA-48F3-9A37-841B7B09CD03}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>gl_local_cubemap_reflections</RootNamespace>
-    <ProjectName>023.gl_local_cubemap_reflections</ProjectName>
+    <RootNamespace>gl_local_cubemap_reflections_aabb</RootNamespace>
+    <ProjectName>023a.gl_local_cubemap_reflections_aabb</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -79,15 +79,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="local_cubemap_reflections.cpp" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\Libraries\glew\build\vc6\glew_static.vcxproj">
       <Project>{74b60fb3-20c7-9065-9e3b-74558196b703}</Project>
     </ProjectReference>
     <ProjectReference Include="..\utils\utils.vcxproj">
       <Project>{b17f9d12-21c7-4753-a9e4-ff9216e31701}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\023a.gl_local_cubemap_reflections_aabb\local_cubemap_reflections_aabb.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

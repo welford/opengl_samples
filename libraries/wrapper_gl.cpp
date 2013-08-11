@@ -52,6 +52,7 @@ static const GLenum enumToGLFrameBufferBlitFilter[] = {GL_NEAREST, GL_LINEAR};
 //http://www.opengl.org/wiki/Image_Format#Texture_and_Renderbuffer
 /*
 tied to Texture::Format
+tied to RenderBuffer::Format also
 */
 static const GLenum enumToGLTextureFormats[] = {
 GL_DEPTH_COMPONENT,
@@ -225,6 +226,17 @@ bool CreateTextureData(Texture::SObject& obj, const Texture::SDescriptor& desc, 
 		else if(IS_3D_TEX(desc.type))
 			glTexImage3DMultisample(enumToGLTextureType[desc.type], desc.nSamples, enumToGLTextureFormats[desc.fmt], desc.w, desc.h, desc.d, false);
 	}
+
+	//set the params just in case we forget
+	WRender::Texture::SParam param[] ={
+		//tex 0
+		{ WRender::Texture::MIN_FILTER, WRender::Texture::NEAREST},
+		{ WRender::Texture::MAG_FILTER, WRender::Texture::NEAREST},
+		{ WRender::Texture::WRAP_S, WRender::Texture::REPEAT},
+		{ WRender::Texture::WRAP_T, WRender::Texture::REPEAT},
+	};
+	WRender::SetTextureParams(obj, param, 4);
+
 	return true;
 }
 

@@ -573,6 +573,145 @@ void main()
 	fragColour = vec4(cube_map_colour.rgb, 1);	
 }
 
+
+-- PhysicallyBasedRendering.Fragment
+
+uniform samplerCube cube_map;
+uniform mat4 inverse_view = mat4( 1.0 );
+
+uniform vec3 cs_min = vec3(-1,-1,-1);
+uniform vec3 cs_max = vec3( 1, 1, 1);
+uniform float cs_radius = 10.0;
+
+in vec4 eye_dir;
+in vec3 normal;
+in vec3 ms_pos;
+
+out vec4 fragColour;
+
+void main()
+{
+	vec3 cubemap_lookup = reflect( normalize(eye_dir.xyz),  normal );
+	vec3 ws_cubemap_lookup = ( inverse_view * vec4( cubemap_lookup, 0 ) ).xyz;	//bascially in cube space, which is world space
+
+	vec3 ws_pos = (inverse_view * vec4( eye_dir.xyz, 1 )).xyz;
+
+	vec3 final_cubemap_lookup = cubemap_lookup;
+	vec4 cube_map_colour = vec4(0, 0, 0, 0);
+
+	//ray segment vs AABB 
+	//ray = P + tD, where p is the origin of the Ray, D is a direction vector of the ray and t is a distance from P along D
+	//AABB is defined as 6 planes, 
+	//plane: X.n = d, where X is a point on the plane, n is the (normalized) normal to the plane and d is the distance of the plane from the origin
+
+	// The ray and plane intersect at 
+	// (P+tD) . n = d (substituting the ray for X)
+	// we want to solve for the only unknown which is t, i.e how far along the ray is the intersections
+	// we can rewrite this as
+	// (P.n) + (tD.n) = d
+	// t(D.n) = d-(P.n)
+	// t = (d-(P.n)) / D.n
+
+	//P is ws_pos
+	//D is ws_cubemap_lookup
+	//n is the normal to the slabs 
+
+	//since an AABB is aligned to the world axis we can cut down on some of the maths as
+	//two elements of any given normal will be 0, and since it is normalized then product of 
+	//D.n is just Dx, Dy or Dz	 depending on the normal
+
+	float EPSILON = 0.00001;
+
+	vec3 nrdir = 1.0f / ws_cubemap_lookup;		
+	vec3 rbmax = (cs_max - ws_pos) * nrdir;
+	vec3 rbmin = (cs_min - ws_pos) * nrdir;	
+	vec3 rbminmax;
+	rbminmax.x = (ws_cubemap_lookup.x>0.0)?rbmax.x:rbmin.x;
+	rbminmax.y = (ws_cubemap_lookup.y>0.0)?rbmax.y:rbmin.y;
+	rbminmax.z = (ws_cubemap_lookup.z>0.0)?rbmax.z:rbmin.z;		
+	float fa = min(min(rbminmax.x, rbminmax.y), rbminmax.z);
+	final_cubemap_lookup = ws_pos + ws_cubemap_lookup * fa;	
+	
+	/*
+	//X axis 
+	if ( abs(ws_cubemap_lookup.x) < EPSILON ){
+		if( cs_pos.x < cs_min.x || cs_pos.x > cs_max.x ){
+			final_cubemap_lookup = cubemap_lookup;
+		}			
+	}
+	else{
+		float ood = 1.0f / ws_cubemap_lookup.x;
+		float _t1 = ( cs_min.x - cs_pos.x ) * ood;
+		float _t2 = ( cs_max.x - cs_pos.x ) * ood;
+		float t1 = min(_t1,_t2);
+		float t2 = min(_t2,_t1);
+	}
+	//Y axis 
+	if ( abs(ws_cubemap_lookup.x) < EPSILON ){
+			
+	}
+	else{
+	}
+	//Z axis 
+	if ( abs(ws_cubemap_lookup.x) < EPSILON ){
+			
+	}
+	else{
+	}
+	*/
+
+	#define M_PI 3.1415926535897932384626433832795
+	#define M_PI_OVER_TWO M_PI*0.5
+	#define M_PI_OVER_FOUR M_PI*0.25
+	//inputs 
+	vec3 light_direction = normalize( (trans.mv * vec4( 1, 1, 0, 0 )).xyz  );		
+	vec3 light_colour = vec3( 0.5, 0.5, 0.5 );
+
+	cube_map_colour = texture( cube_map, final_cubemap_lookup);
+	vec3 specular_colour = vec3(0.5);// * cube_map_colour.xyz;
+	vec3 diffuse_cube_map_colour = texture( cube_map, ws_cubemap_lookup ).rgb;
+
+	float specular_power = 1.0;	
+
+	vec3 half_vector = normalize( light_direction - eye_dir.xyz);
+
+	float n_dot_l = clamp( dot( normal, light_direction ), 0, 1 );
+	float n_dot_h = clamp( dot( normal, half_vector ), 0, 1 );
+	float h_dot_l = dot( half_vector, light_direction );
+	float n_dot_v = clamp( dot( normal, eye_dir.xyz), 0, 1 );
+	float cosine_term = n_dot_l;	
+
+	vec3 diffuse = n_dot_l * light_colour;
+
+	float normalisation_term = ( specular_power + 2.0f ) / 8.0f;
+	//float normalisation_term = ( specular_power + 2.0f ) / 2.0f * M_PI;
+	float blinn_phong = pow( n_dot_h, specular_power );    // n_dot_h is the saturated dot product of the normal and half vectors
+	float specular_term = normalisation_term * blinn_phong;
+
+
+	float base = 1.0f - h_dot_l;    // Dot product of half vector and light vector. No need to saturate as it can't go above 90 degrees
+	float exponential = pow( base, 5.0f );
+	vec3 fresnel_term = specular_colour + ( 1.0f - specular_colour ) * exponential;
+
+
+	float alpha = 1.0f / ( sqrt( M_PI_OVER_FOUR * specular_power + M_PI_OVER_TWO ) );
+	float visibility_term = ( n_dot_l * ( 1.0f - alpha ) + alpha ) * ( n_dot_v * ( 1.0f - alpha ) + alpha ); // Both dot products should be saturated
+	visibility_term = 1.0f / visibility_term;
+
+	vec3 specular = specular_term * cosine_term * fresnel_term * visibility_term * light_colour;
+	//vec3 specular = vec3(specular_term);// * cosine_term * fresnel_term * visibility_term * light_colour;
+	//vec3 specular = vec3(cosine_term);// * fresnel_term * visibility_term * light_colour;
+	//vec3 specular = fresnel_term;
+	//vec3 specular = visibility_term;
+	
+	//cube_map_colour = texture( cube_map, final_cubemap_lookup);
+	//fragColour = vec4(cube_map_colour.rgb, 1);	
+
+	fragColour = vec4( diffuse*cube_map_colour.rgb + specular, 1 );	
+	//fragColour = vec4( diffuse , 1 );	
+	//fragColour = vec4( specular, 1 );	
+}
+
 -- Skymap.Vertex
 
 out vec3 cubemap_lookup;

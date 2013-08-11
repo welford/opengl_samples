@@ -288,11 +288,11 @@ void MainLoop(CPlatform * const  pPlatform)
 	pPlatform->UpdateBuffers();
 	if ( !pPlatform->GetKeyboard().keys[KB_LEFTSHIFT].IsPressed() ){
 		if(pPlatform->GetKeyboard().keys[KB_UP].IsPressed()){
-			smallest_pure_white += 0.1f * pPlatform->GetDT();
+			smallest_pure_white += 0.5f * pPlatform->GetDT();
 			d_printf("smallest_pure_white:%f\n", smallest_pure_white);
 		}
 		if(pPlatform->GetKeyboard().keys[KB_DOWN].IsPressed()){
-			smallest_pure_white -= 0.1f * pPlatform->GetDT();
+			smallest_pure_white -= 0.5f * pPlatform->GetDT();
 			if(smallest_pure_white < 0.0f)
 				smallest_pure_white = 0.0f;
 			d_printf("smallest_pure_white:%f\n", smallest_pure_white);
@@ -300,11 +300,11 @@ void MainLoop(CPlatform * const  pPlatform)
 	}
 	else{
 		if(pPlatform->GetKeyboard().keys[KB_UP].IsPressed()){
-			key += 0.1f * pPlatform->GetDT();
+			key += 0.5f * pPlatform->GetDT();
 			d_printf("key:%f\n", key);
 		}
 		if(pPlatform->GetKeyboard().keys[KB_DOWN].IsPressed()){
-			key -= 0.1f * pPlatform->GetDT();
+			key -= 0.5f * pPlatform->GetDT();
 			if(key < 0.0f)
 				key = 0.0f;
 			d_printf("key:%f\n", key);

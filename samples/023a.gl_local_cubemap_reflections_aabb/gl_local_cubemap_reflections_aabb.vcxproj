@@ -14,7 +14,7 @@
     <ProjectGuid>{908E0FA0-F63F-49E4-96F0-00C80073266F}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>gl_local_cubemap_reflections_aabb</RootNamespace>
-    <ProjectName>022.gl_local_cubemap_reflections_aabb</ProjectName>
+    <ProjectName>024.gl_physically_based_rendering</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -79,15 +79,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="local_cubemap_reflections_aabb.cpp" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\Libraries\glew\build\vc6\glew_static.vcxproj">
       <Project>{74b60fb3-20c7-9065-9e3b-74558196b703}</Project>
     </ProjectReference>
     <ProjectReference Include="..\utils\utils.vcxproj">
       <Project>{b17f9d12-21c7-4753-a9e4-ff9216e31701}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\024.gl_physically_based_rendering\physically_based_rendering.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

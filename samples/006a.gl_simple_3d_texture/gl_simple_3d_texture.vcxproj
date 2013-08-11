@@ -11,10 +11,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{DC2AE4C5-F763-45BD-8696-E86488273639}</ProjectGuid>
+    <ProjectGuid>{620AD2F7-4CFF-4DC7-BC1C-151C83608D87}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>gl_local_cubemap_reflections</RootNamespace>
-    <ProjectName>023.gl_local_cubemap_reflections</ProjectName>
+    <RootNamespace>gl_simple_3d_texture</RootNamespace>
+    <ProjectName>006a.gl_simple_3d_texture</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -42,9 +42,13 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -79,7 +83,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="local_cubemap_reflections.cpp" />
+    <ClCompile Include="3d_texture_test.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Libraries\glew\build\vc6\glew_static.vcxproj">

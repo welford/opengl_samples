@@ -335,8 +335,9 @@ namespace Pixel
 
 /*
 part of a framebuffer
+
 */
-namespace RenderBuffer
+namespace RenderBuffer //changes here must be reflected int enumToGLTextureFormats
 {
 	//http://www.opengl.org/wiki/Image_Format#Texture_and_Renderbuffer
 	enum Format
@@ -347,6 +348,7 @@ namespace RenderBuffer
 		DEPTH_COMPONENT24, 
 		DEPTH_COMPONENT32, 
 		DEPTH_COMPONENT32F,
+		DEPTH_STENCIL,
 		DEPTH24_STENCIL8, 
 		DEPTH32F_STENCIL8,
 
