@@ -553,6 +553,15 @@ void			UnbindVertexArrayObject(void); //needed?
 void			SetAttributeFormat( const VertexAttribute* pAttr, unsigned int numAttr, unsigned int v_offset);
 
 //-------------------------------------------------
+// Transform Feedback objects
+//-------------------------------------------------
+unsigned int	CreateTransformFeedback( void );
+void			DeleteTransformFeedback( unsigned int );
+void			BindTransformFeedback(const unsigned int );
+void			UnbindTransformFeedback(void);
+void			DrawTransformFeedback(const DrawMode mode, const unsigned int xbo);
+
+//-------------------------------------------------
 // BUFFERS
 //-------------------------------------------------
 //create/destroy various buffers
@@ -579,11 +588,17 @@ void			FillTextureFromArrayBuffer(unsigned int id, unsigned int texID, int x, in
 //-------------------------------------------------
 // Drawing
 //-------------------------------------------------
-void Draw(DrawMode mode, ElementType elm, unsigned int nIndices, unsigned int i_offset);
-void DrawArray(DrawMode mode, unsigned int count, unsigned int offset);
-void DrawInstanced(DrawMode mode, ElementType elm, unsigned int nIndices, unsigned int i_offset, unsigned int n);
-void DrawArrayInstanced(DrawMode mode, unsigned int count, unsigned int offset, unsigned int n);
-	
+void Draw(const DrawMode mode, const ElementType elm, const unsigned int nIndices, const unsigned int i_offset);
+void DrawArray(const DrawMode mode, const unsigned int count, const unsigned int offset);
+void DrawInstanced(const DrawMode mode, const ElementType elm, const unsigned int nIndices, const unsigned int i_offset, unsigned int n);
+void DrawArrayInstanced(const DrawMode mode, const unsigned int count, const unsigned int offset, const unsigned int n);
+
+//-------------------------------------------------
+// Transform Feedback
+//-------------------------------------------------
+void BeginTransformFeedback( DrawMode mode );
+void EndTransformFeedback( void );
+
 //-------------------------------------------------
 // Frame Buffers
 //-------------------------------------------------

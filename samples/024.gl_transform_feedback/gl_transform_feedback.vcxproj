@@ -11,10 +11,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{908E0FA0-F63F-49E4-96F0-00C80073266F}</ProjectGuid>
+    <ProjectGuid>{62A43E16-7800-49DE-A297-169D7C9062B8}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>gl_local_cubemap_reflections_aabb</RootNamespace>
-    <ProjectName>023a.gl_local_cubemap_reflections_aabb</ProjectName>
+    <RootNamespace>gl_transform_feedback</RootNamespace>
+    <ProjectName>024.gl_transform_feedback</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -87,7 +87,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include=".\local_cubemap_reflections_aabb.cpp" />
+    <ClCompile Include=".\transform_feedback.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

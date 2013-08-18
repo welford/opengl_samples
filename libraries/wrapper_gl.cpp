@@ -362,6 +362,34 @@ void SetAttributeFormat( const VertexAttribute* pAttr, unsigned int numAttr, uns
 			BindBuffer(ARRAY, currentVBO);
 	}
 }
+//-------------------------------------------------
+// Transform feedback Objects
+//-------------------------------------------------
+unsigned int CreateTransformFeedback(void){
+	unsigned int xbo;
+	glGenTransformFeedbacks(1, &xbo);
+	return xbo;
+}
+
+void DeleteTransformFeedback(unsigned int xbo){
+	glDeleteTransformFeedbacks(1, &xbo);
+}
+
+void BindTransformFeedback(const unsigned int xbo){
+	glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, xbo);
+}
+
+void UnbindTransformFeedback(void){
+	glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0);
+}
+
+void DrawTransformFeedback(const DrawMode mode, const unsigned int xbo){
+	glDrawTransformFeedback(enumToGLPrimitiveType[mode], xbo);
+}
+
+//-------------------------------------------------
+// Vertex buffers
+//-------------------------------------------------
 
 //create/destroy various buffers
 unsigned int CreateBuffer(Buffer idx)
@@ -446,7 +474,6 @@ void BindBufferToIndex(Buffer type, unsigned int id, unsigned int idx)
 	if(type != UNIFORM || type != FEEDBACK) //need to add atomic counter buffer too
 		return
 	glBindBufferBase(enumToGLBuffers[type], idx, id);
-
 }
 
 void InitBuffer(Buffer type, BufferUse uidx, unsigned int id, unsigned int size, const void* pData)
@@ -475,28 +502,42 @@ void FillTextureFromArrayBuffer(unsigned int id, unsigned int texID, int x, int 
 {
 }
 
-void Draw(DrawMode idx, ElementType elm, unsigned int nIndices, unsigned int i_offset)
+void Draw(const DrawMode idx, const ElementType elm, const unsigned int nIndices, const unsigned int i_offset)
 {
 	glDrawElements( enumToGLPrimitiveType[idx], nIndices, enumToGLElementType[elm], BUFFER_OFFSET(i_offset));	
 }
 	
-void DrawArray(DrawMode idx, unsigned int count, unsigned int offset)
+void DrawArray(const DrawMode idx, const unsigned int count, const unsigned int offset)
 {
 	//glEnable(GL_BLEND);//
 	//glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDrawArrays(enumToGLPrimitiveType[idx], offset, count);
 }
 
-void DrawInstanced(DrawMode idx, ElementType elm, unsigned int nIndices, unsigned int i_offset, unsigned int n)
+void DrawInstanced(const DrawMode idx, const ElementType elm, const unsigned int nIndices, const unsigned int i_offset, const unsigned int n)
 {
 	glDrawElementsInstanced( enumToGLPrimitiveType[idx], nIndices, enumToGLElementType[elm], BUFFER_OFFSET(i_offset), n);
 }
 
-void DrawArrayInstanced(DrawMode idx, unsigned int count, unsigned int offset, unsigned int n)
+void DrawArrayInstanced(const DrawMode idx, const unsigned int count, const unsigned int offset, const unsigned int n)
 {
 	glDrawArraysInstanced( enumToGLPrimitiveType[idx], offset, count, n);
 }
-	
+
+//-------------------------------------------------
+// Transform Feedback
+//-------------------------------------------------
+void BeginTransformFeedback( DrawMode mode ){
+	if ( mode != POINTS && mode != TRIANGLES && mode != LINES ){
+		return;
+	}
+	glBeginTransformFeedback( enumToGLPrimitiveType[ mode ] );
+}
+
+void EndTransformFeedback( void ){
+	glEndTransformFeedback( );
+}
+
 //-------------------------------------------------
 // Frame Buffers
 //-------------------------------------------------

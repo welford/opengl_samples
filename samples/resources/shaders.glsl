@@ -100,6 +100,49 @@ void main()
 	fragColour = vec4(colour.rgb,1);
 }
 
+-- TransformFeedback
+
+out vec3 position;
+out vec3 colour;
+
+void main()
+{
+	vec4 final_position = vec4(inVertex,1) ;
+	colour = inColour;
+	position = inVertex.xyz + vec3( 0.5, 0.5, 0 );
+	
+	gl_Position = final_position;
+}
+
+-- TransformFeedbackObject
+
+out vec3 position;
+out vec3 colour;
+out vec3 colour1;
+
+void main()
+{
+	vec4 final_position = vec4(inVertex,1) ;
+	colour = inColour;
+	colour1 = vec3(1,0,1);
+	position = inVertex.xyz + vec3( 0.5, 0.5, 0 );
+	
+	gl_Position = final_position;
+}
+
+-- TransformFeedbackObjectFragment
+
+#version 420 core
+in vec3 colour;
+in vec3 colour1;
+out vec4 fragColour;
+
+void main()
+{
+	fragColour = vec4(colour + colour1,1);
+}
+
+
 -- Dbg.ScreenSpaceTexture.Vertex
 
 #version 420 core

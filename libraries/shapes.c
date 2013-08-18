@@ -26,7 +26,7 @@ static void Normalise(XYZ*const p)
 unsigned int GetCubeSize(void){
 	return 36;
 }
-int CreateCube(float* pf){
+void CreateCube(float* pf){
 	float pos[8][3] = {
 		{-1.0f,	-1.0f,  1.0f},
 		{-1.0f,	 1.0f,  1.0f},
@@ -97,7 +97,7 @@ unsigned int GetCubeNormalSize(void){
 	return 36;
 }
 
-int CreateCubeNormal(float* pf){
+void CreateCubeNormal(float* pf){
 	float pos[8][3] = {
 		{-1.0f,	-1.0f,  1.0f},
 		{-1.0f,	 1.0f,  1.0f},

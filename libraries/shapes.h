@@ -9,10 +9,10 @@
 //don't require element arrays
 
 extern unsigned int GetCubeSize(void);
-extern int CreateCube(float* pf);
+extern void CreateCube(float* pf);
 
 extern unsigned int GetCubeNormalSize(void);
-extern int CreateCubeNormal(float* pf);
+extern void CreateCubeNormal(float* pf);
 
 extern unsigned int GetNSphereSize(int iterations);
 extern int CreateNSphere(float*const pf,int iterations);

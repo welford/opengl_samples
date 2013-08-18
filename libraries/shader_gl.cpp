@@ -208,10 +208,11 @@ unsigned int CShaderProgram::GetAttributeLocation(const char* name)
 void CShaderProgram::RecordOutput(const char** pOP, RecordMode rm)
 {
 	int mode;
-	if(rm == INTERLEAVED)
+	if(rm == INTERLEAVED){
 		mode = GL_INTERLEAVED_ATTRIBS;
-	else
+	}else{
 		mode = GL_SEPARATE_ATTRIBS;
+	}
 
 	int count = 0;
 	const char**pCnt = pOP;
