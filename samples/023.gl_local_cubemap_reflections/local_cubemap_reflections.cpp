@@ -110,7 +110,7 @@ void CreateCubeMapTextures(){
 void Setup(CPlatform * const  pPlatform)
 {
 	unsigned int got = 0;
-	const char *pVertStr[2] = {0,0}, *pFragStr[2] = {0,0};
+	const char *pVertStr[3] = {0,0,0}, *pFragStr[3] = {0,0,0};
 	float *pFrustumVertices = 0;
 	float colour[] = {1.0f,0.0f,0.0f, 0.0f,1.0f,0.0f, 0.0f,0.0f,1.0f};
 	int nFacets = 0;
@@ -122,10 +122,10 @@ void Setup(CPlatform * const  pPlatform)
 	
 	// - - - - - - - - - - - - - - - - - - - -
 	// - - - - - - - - - - - - - - - - - - - -
-	glswGetShadersAlt( "shaders.Shared+shaders.Skymap.Vertex", pVertStr, 2);
-	glswGetShadersAlt( "shaders.Shared+shaders.Skymap.Fragment", pFragStr, 2);
-	CShader vertexShader(CShader::VERT, pVertStr, 2);
-	CShader fragmentShader(CShader::FRAG, pFragStr, 2);	
+	glswGetShadersAlt( "shaders.Version+shaders.Shared+shaders.Skymap.Vertex", pVertStr, 3);
+	glswGetShadersAlt( "shaders.Version+shaders.Shared+shaders.Skymap.Fragment", pFragStr, 3);
+	CShader vertexShader(CShader::VERT, pVertStr, 3);
+	CShader fragmentShader(CShader::FRAG, pFragStr, 3);	
 	//setup the shaders
 	program_cube.Initialise();
 	program_cube.AddShader(&vertexShader);
@@ -137,10 +137,10 @@ void Setup(CPlatform * const  pPlatform)
 
 	// - - - - - - - - - - - - - - - - - - - -
 	// - - - - - - - - - - - - - - - - - - - -
-	glswGetShadersAlt( "shaders.Shared+shaders.LocalCubemapReflections.Vertex", pVertStr, 2);
-	glswGetShadersAlt( "shaders.Shared+shaders.LocalCubemapReflections.Fragment", pFragStr, 2);
-	CShader vertexShader1(CShader::VERT, pVertStr, 2);
-	CShader fragmentShader1(CShader::FRAG, pFragStr, 2);	
+	glswGetShadersAlt( "shaders.Version+shaders.Shared+shaders.LocalCubemapReflections.Vertex", pVertStr, 3);
+	glswGetShadersAlt( "shaders.Version+shaders.Shared+shaders.LocalCubemapReflections.Fragment", pFragStr, 3);
+	CShader vertexShader1(CShader::VERT, pVertStr, 3);
+	CShader fragmentShader1(CShader::FRAG, pFragStr, 3);	
 	//setup the shaders
 	program_local_sphere.Initialise();
 	program_local_sphere.AddShader(&vertexShader1);
@@ -152,10 +152,10 @@ void Setup(CPlatform * const  pPlatform)
 
 	// - - - - - - - - - - - - - - - - - - - -
 	// - - - - - - - - - - - - - - - - - - - -
-	glswGetShadersAlt( "shaders.Shared+shaders.CubemapReflections.Vertex", pVertStr, 2);
-	glswGetShadersAlt( "shaders.Shared+shaders.CubemapReflections.Fragment", pFragStr, 2);
-	CShader vertexShader2(CShader::VERT, pVertStr, 2);
-	CShader fragmentShader2(CShader::FRAG, pFragStr, 2);	
+	glswGetShadersAlt( "shaders.Version+shaders.Shared+shaders.CubemapReflections.Vertex", pVertStr, 3);
+	glswGetShadersAlt( "shaders.Version+shaders.Shared+shaders.CubemapReflections.Fragment", pFragStr, 3);
+	CShader vertexShader2(CShader::VERT, pVertStr, 3);
+	CShader fragmentShader2(CShader::FRAG, pFragStr, 3);	
 	//setup the shaders
 	program_sphere.Initialise();
 	program_sphere.AddShader(&vertexShader2);

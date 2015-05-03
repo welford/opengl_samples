@@ -54,7 +54,7 @@ int PlatformMain( void ){
 void Setup(CPlatform * const  pPlatform)
 {
 	unsigned int got = 0;
-	const char *pVertStr[2] = {0,0}, *pFragStr = 0;
+	const char *pVertStr[3] = {0,0,0}, *pFragStr = 0;
 
 	unsigned int nSphereFloats;
 	float *pSphereVertices = 0;
@@ -83,8 +83,8 @@ void Setup(CPlatform * const  pPlatform)
 	WRender::SetClearColour(0,0,0,0);	
 	WRender::EnableCulling(true);
 	
-	got = glswGetShadersAlt("shaders.Shared+shaders.BasicVertexShader", pVertStr, 2);
-	pFragStr = glswGetShaders("shaders.BasicFragmentShader");
+	got = glswGetShadersAlt("shaders.Version+shaders.Shared+shaders.BasicVertexShader", pVertStr, 3);
+	pFragStr = glswGetShaders("shaders.Version+shaders.BasicFragmentShader");
 	CShader vertexShader(CShader::VERT, pVertStr, got);
 	CShader fragmentShader(CShader::FRAG, &pFragStr, 1);
 	CShaderProgram program;

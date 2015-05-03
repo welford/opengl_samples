@@ -102,7 +102,7 @@ void CreateCubeMapTextures(){
 void Setup(CPlatform * const  pPlatform)
 {
 	unsigned int got = 0;
-	const char *pVertStr[2] = {0,0}, *pFragStr[2] = {0,0};
+	const char *pVertStr[3] = {0,0,0}, *pFragStr[3] = {0,0,0};
 	float *pFrustumVertices = 0;
 	float colour[] = {1.0f,0.0f,0.0f, 0.0f,1.0f,0.0f, 0.0f,0.0f,1.0f};
 	int nFacets = 0;
@@ -114,10 +114,10 @@ void Setup(CPlatform * const  pPlatform)
 	
 	// - - - - - - - - - - - - - - - - - - - -
 	// - - - - - - - - - - - - - - - - - - - -
-	glswGetShadersAlt( "shaders.Shared+shaders.Skymap.Vertex", pVertStr, 2);
-	glswGetShadersAlt( "shaders.Shared+shaders.Skymap.Fragment", pFragStr, 2);
-	CShader vertexShader(CShader::VERT, pVertStr, 2);
-	CShader fragmentShader(CShader::FRAG, pFragStr, 2);	
+	glswGetShadersAlt( "shaders.Version+shaders.Shared+shaders.Skymap.Vertex", pVertStr, 3);
+	glswGetShadersAlt( "shaders.Version+shaders.Shared+shaders.Skymap.Fragment", pFragStr, 3);
+	CShader vertexShader(CShader::VERT, pVertStr, 3);
+	CShader fragmentShader(CShader::FRAG, pFragStr, 3);	
 	//setup the shaders
 	program_cube.Initialise();
 	program_cube.AddShader(&vertexShader);

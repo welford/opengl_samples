@@ -1,6 +1,9 @@
--- Shared
+-- Version
 
 #version 420 core
+
+-- Shared
+
 layout(location = 0) in vec3 inVertex;
 layout(location = 1) in vec3 inColour;
 layout(std140, binding=1) uniform Transforms
@@ -35,7 +38,6 @@ void main()
 
 -- Fragment
 
-#version 420 core
 in vec3 colour;
 out vec4 fragColour;
 void main()

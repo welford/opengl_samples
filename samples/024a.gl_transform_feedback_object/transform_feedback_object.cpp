@@ -65,7 +65,7 @@ int PlatformMain( void ){
 void Setup(CPlatform * const  pPlatform)
 {
 	unsigned int got = 0;
-	const char *pVertStr[2] = {0,0}, *pFragStr = 0;
+	const char *pVertStr[3] = {0,0,0}, *pFragStr = 0;
 
 	int nFacets = 0;
 
@@ -74,8 +74,8 @@ void Setup(CPlatform * const  pPlatform)
 	WRender::SetClearColour(0,0,0,0);	
 	WRender::EnableCulling(true);
 	
-	got = glswGetShadersAlt("shaders.Shared+shaders.TransformFeedbackObject", pVertStr, 2);
-	pFragStr = glswGetShaders("shaders.TransformFeedbackObjectFragment");
+	got = glswGetShadersAlt("shaders.Version+shaders.Shared+shaders.TransformFeedbackObject", pVertStr, 3);
+	pFragStr = glswGetShaders("shaders.Version+shaders.TransformFeedbackObjectFragment");
 	CShader vertexShader(CShader::VERT, pVertStr, got);
 	CShader fragmentShader(CShader::FRAG, &pFragStr, 1);
 	CShaderProgram program;

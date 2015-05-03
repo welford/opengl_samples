@@ -1,6 +1,9 @@
--- Shared
+-- Version
 
 #version 420 core
+
+-- Shared
+
 layout(location = 0) in vec3 inVertex;
 layout(location = 1) in vec3 inColour;
 layout(location = 2) in vec3 inNormal;
@@ -16,7 +19,6 @@ uniform mat4		nrmn;
 
 -- MRT.Stage1.Vertex
 
-#version 420 core
 layout(location = 0) in vec3 inVertex;
 out vec3 colour;
 void main()
@@ -28,7 +30,6 @@ void main()
 
 -- MRT.Stage1.Fragment
 
-#version 420 core
 in vec3 colour;
 layout(location = 0) out vec4 outFragColour[3]; //fils up locations 0, 1, 2
 void main()
@@ -40,7 +41,6 @@ void main()
 
 -- MRT_2.Stage1.Fragment
 
-#version 420 core
 in vec3 colour;
 layout(location = 0) out vec4 outFragColour[4];  //fils up locations 0, 1, 2, 3
 void main()
@@ -53,7 +53,6 @@ void main()
 
 -- MRT.Stage2.Vertex
 
-#version 420 core
 layout(location = 0) in vec3 inVertex;
 layout(location = 1) in vec2 inTexCoord;
 uniform float scale = 0.9;
@@ -69,7 +68,6 @@ void main()
 
 -- MRT.Stage2.Fragment
 
-#version 420 core
 in vec2 tex;
 out vec4 fragColour;
 uniform sampler2D mrt;
@@ -91,7 +89,6 @@ void main()
 
 -- BasicFragmentShader
 
-#version 420 core
 in vec3 colour;
 out vec4 fragColour;
 
@@ -132,7 +129,6 @@ void main()
 
 -- TransformFeedbackObjectFragment
 
-#version 420 core
 in vec3 colour;
 in vec3 colour1;
 out vec4 fragColour;
@@ -145,7 +141,6 @@ void main()
 
 -- Dbg.ScreenSpaceTexture.Vertex
 
-#version 420 core
 layout(location = 0) in vec3 inVertex;
 layout(location = 1) in vec2 inTexCoord;
 uniform float scale = 1.0;
@@ -160,7 +155,6 @@ void main()
 
 -- Dbg.ScreenSpaceTexture.Fragment
 
-#version 420 core
 in vec2 tex;
 out vec4 fragColour;
 layout(binding=0) uniform sampler2D tex_smp;
@@ -185,7 +179,6 @@ void main()
 
 -- SingleShadow.Fragment
 
-#version 420 core
 in vec3 colour;
 in vec4 shadowPosition;
 out vec4 fragColour;
@@ -226,8 +219,8 @@ void main()
 }
 
 -- MultiShadow.Fragment
+
 //#define NUM_SHADOWS 10 //set externally
-#version 420 core
 in vec3 colour;
 in vec4 shadowPosition[NUM_SHADOWS];
 out vec4 fragColour;
@@ -253,7 +246,7 @@ void main()
 }
 
 -- PassThroughVertex
-#version 420 core
+
 layout(location = 0) in vec3 inVertex;
 void main()
 {
@@ -261,7 +254,6 @@ void main()
 }
 
 -- PassThroughGeometry
-#version 420 core
 
 layout (triangles) in;
 layout (triangle_strip, max_vertices = 3) out;
@@ -276,7 +268,7 @@ void main()
 }
 
 -- PassThroughFragment
-#version 420 core
+
 //in vec3 colour;
 out vec4 fragColour;
 void main()
@@ -285,7 +277,6 @@ void main()
 }
 
 -- AddColorGeometry
-#version 420 core
 
 layout (triangles) in;
 layout (triangle_strip, max_vertices = 3) out;
@@ -308,7 +299,7 @@ void main()
 }
 
 -- AddColorFragment
-#version 420 core
+
 in vec3 color;
 out vec4 fragColour;
 void main()
@@ -317,7 +308,6 @@ void main()
 }
 
 -- DuplicatePrimitiveGeometry
-#version 420 core
 
 layout (triangles) in;
 layout (triangle_strip, max_vertices = 6) out;
@@ -377,7 +367,6 @@ void main()
 
 -- FlatShading.Fragment
 
-#version 420 core
 in vec3 colour;
 in vec4 light;
 in vec4 position;
@@ -778,7 +767,6 @@ void main()
 
 -- Gamma.Vertex
 
-#version 420 core
 layout(location = 0) in vec3 inVertex;
 layout(location = 1) in vec2 inTexCoord;
 uniform float scale = 1.0;
@@ -793,7 +781,6 @@ void main()
 
 -- Gamma.Fragment
 
-#version 420 core
 in vec2 tex;
 out vec4 fragColour;
 uniform sampler2D src_image;
@@ -816,7 +803,6 @@ void main()
 
 -- Post.Vertex
 
-#version 420 core
 layout(location = 0) in vec3 inVertex;
 layout(location = 1) in vec2 inTexCoord;
 
@@ -833,7 +819,6 @@ void main()
 
 -- Post.Fragment
 
-#version 420 core
 in vec2 tex;
 out vec4 fragColour;
 uniform sampler2D src_clr;
@@ -847,8 +832,6 @@ void main()
 }
 
 -- Post.HDR.Luminance.Fragment
-
-#version 420 core
 
 //http://www.cis.rit.edu/people/faculty/ferwerda/publications/sig02_paper.pdf
 // equation 1
@@ -866,7 +849,6 @@ void main()
 
 -- Post.HDR.VisibleRange.Fragment
 
-#version 420 core
 in vec2 tex;
 out vec4 fragColour;
 

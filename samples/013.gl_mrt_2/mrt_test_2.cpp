@@ -119,13 +119,13 @@ void Setup(CPlatform * const  pPlatform)
 	WRender::CheckFrameBuffer(fboForBlitting);
 
 	//setup shaders	
-	pV = glswGetShaders("shaders.MRT.Stage1.Vertex");
-	pF = glswGetShaders("shaders.MRT_2.Stage1.Fragment");
+	pV = glswGetShaders("shaders.Version+shaders.MRT.Stage1.Vertex");
+	pF = glswGetShaders("shaders.Version+shaders.MRT_2.Stage1.Fragment");
 	CShader vertexShader(CShader::VERT, &pV, 1);
 	CShader fragmentShader(CShader::FRAG, &pF, 1);
 
-	pV = glswGetShaders("shaders.MRT.Stage2.Vertex");
-	pF = glswGetShaders("shaders.MRT.Stage2.Fragment");
+	pV = glswGetShaders("shaders.Version+shaders.MRT.Stage2.Vertex");
+	pF = glswGetShaders("shaders.Version+shaders.MRT.Stage2.Fragment");
 	CShader vertexShaderStage2(CShader::VERT, &pV, 1);
 	CShader fragmentShaderStage2(CShader::FRAG, &pF, 1);
 

@@ -91,7 +91,7 @@ void Setup(CPlatform * const  pPlatform)
 	unsigned int torusSegments = 36, torusTubeSegments = 36;
 
 	//for the shaders
-	const char *pVertStr[2] = {0,0}, *pFragStr = 0;
+	const char *pVertStr[3] = {0,0,0}, *pFragStr = 0;
 	const char *pFragTexStr = 0, *pVertTexStr = 0;
 
 	//fbo stuff
@@ -112,9 +112,9 @@ void Setup(CPlatform * const  pPlatform)
 	// - - - - - - - - - - 
 
 	//normal shader
-	glswGetShadersAlt("shaders.Shared+shaders.SingleShadow.Vertex", pVertStr, 2);
-	pFragStr = glswGetShaders("shaders.SingleShadow.Fragment");
-	CShader vertexShader(CShader::VERT, pVertStr, 2);
+	glswGetShadersAlt("shaders.Version+shaders.Shared+shaders.SingleShadow.Vertex", pVertStr, 3);
+	pFragStr = glswGetShaders("shaders.Version+shaders.SingleShadow.Fragment");
+	CShader vertexShader(CShader::VERT, pVertStr, 3);
 	CShader fragmentShader(CShader::FRAG, &pFragStr, 1);
 	
 	program.Initialise();
@@ -127,8 +127,8 @@ void Setup(CPlatform * const  pPlatform)
 	program.Stop();
 
 	//debug shader for textures in screen space
-	pVertTexStr = glswGetShaders("shaders.Dbg.ScreenSpaceTexture.Vertex");
-	pFragTexStr = glswGetShaders("shaders.Dbg.ScreenSpaceTexture.Fragment");
+	pVertTexStr = glswGetShaders("shaders.Version+shaders.Dbg.ScreenSpaceTexture.Vertex");
+	pFragTexStr = glswGetShaders("shaders.Version+shaders.Dbg.ScreenSpaceTexture.Fragment");
 	CShader vTexShader(CShader::VERT, &pVertTexStr, 1);
 	CShader fTexShader(CShader::FRAG, &pFragTexStr, 1);	
 

@@ -90,19 +90,19 @@ void Setup(CPlatform * const  pPlatform)
 	WRender::EnableCulling(true);
 	
 	//got = glswGetShadersAlt("Dbg.ScreenSpaceTexture.Vertex", pVertStr, 1);
-	pVertStr[0] = glswGetShaders("shaders.Dbg.ScreenSpaceTexture.Vertex");
-	pFragStr = glswGetShaders("shaders.Dbg.ScreenSpaceTexture.Fragment");
+	pVertStr[0] = glswGetShaders("shaders.Version+shaders.Dbg.ScreenSpaceTexture.Vertex");
+	pFragStr = glswGetShaders("shaders.Version+shaders.Dbg.ScreenSpaceTexture.Fragment");
 	CShader vertexShader(CShader::VERT, &pVertStr[0], 1);
 	CShader fragmentShader(CShader::FRAG, &pFragStr, 1);
 
 
-	pVertStr[0] = glswGetShaders("shaders.Post.Vertex");
-	pFragStr = glswGetShaders("shaders.Post.HDR.Luminance.Fragment");
+	pVertStr[0] = glswGetShaders("shaders.Version+shaders.Post.Vertex");
+	pFragStr = glswGetShaders("shaders.Version+shaders.Post.HDR.Luminance.Fragment");
 	CShader vertexShaderStage2(CShader::VERT, &pVertStr[0], 1);
 	CShader fragmentShaderStage2(CShader::FRAG, &pFragStr, 1);
 
-	pVertStr[0] = glswGetShaders("shaders.Post.Vertex");
-	pFragStr = glswGetShaders("shaders.Post.HDR.VisibleRange.Fragment");
+	pVertStr[0] = glswGetShaders("shaders.Version+shaders.Post.Vertex");
+	pFragStr = glswGetShaders("shaders.Version+shaders.Post.HDR.VisibleRange.Fragment");
 	CShader vertexShaderStage3(CShader::VERT, &pVertStr[0], 1);
 	CShader fragmentShaderStage3(CShader::FRAG, &pFragStr, 1);
 

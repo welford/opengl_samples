@@ -46,16 +46,16 @@ void Setup(CPlatform * const  pPlatform)
 		glswSetPath("../resources/", ".glsl");
 	}
 
-	const char* pV = glswGetShaders("shaders.PassThroughVertex");
+	const char* pV = glswGetShaders("shaders.Version+shaders.PassThroughVertex");
 	//pass though shader
-	//const char* pG = glswGetShaders("shaders.PassThroughGeometry");
-	//const char* pF = glswGetShaders("shaders.PassThroughFragment");
+	//const char* pG = glswGetShaders("shaders.Version+shaders.PassThroughGeometry");
+	//const char* pF = glswGetShaders("shaders.Version+shaders.PassThroughFragment");
 	//add extra attributes at geometry stage
-	const char* pG = glswGetShaders("shaders.AddColorGeometry");
-	const char* pF = glswGetShaders("shaders.AddColorFragment");
+	const char* pG = glswGetShaders("shaders.Version+shaders.AddColorGeometry");
+	const char* pF = glswGetShaders("shaders.Version+shaders.AddColorFragment");
 	//duplicates geometry
-	//const char* pG = glswGetShaders("shaders.DuplicatePrimitiveGeometry");
-	//const char* pF = glswGetShaders("shaders.PassThroughFragment");
+	//const char* pG = glswGetShaders("shaders.Version+shaders.DuplicatePrimitiveGeometry");
+	//const char* pF = glswGetShaders("shaders.Version+shaders.PassThroughFragment");
 
 	CShader vertexShader(CShader::VERT, &pV, 1);
 	CShader geometryShader(CShader::GEOM, &pG, 1);

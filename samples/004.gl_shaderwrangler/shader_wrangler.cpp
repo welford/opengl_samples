@@ -75,10 +75,10 @@ void Setup(CPlatform * const  pPlatform)
 	}
 
 	{
-	const char* pStr[2] = {0,0};
-	int got = glswGetShadersAlt("shaders.Shared+shaders.Vertex", pStr, 2);
-	const char* pV2 = glswGetShaders("shaders.Shared+shaders.Vertex2");
-	const char* pF = glswGetShaders("shaders.Fragment");
+	const char* pStr[3] = {0,0,0};
+	int got = glswGetShadersAlt("shaders.Version+shaders.Shared+shaders.Vertex", pStr, 3);
+	const char* pV2 = glswGetShaders("shaders.Version+shaders.Shared+shaders.Vertex2");
+	const char* pF = glswGetShaders("shaders.Version+shaders.Fragment");
 
 	CShader vertexShader(CShader::VERT, pStr, got);
 	CShader vertexShader2(CShader::VERT, &pV2, 1);
